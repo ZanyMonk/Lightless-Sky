@@ -1,0 +1,6 @@
+float coef_x = (( float(target_y)-float(hero.dep_y) ) / ( float(target_x)-float(hero.dep_x) ));
+
+sprintf( szFps, "%s: %d FPS", "SDL2 Base C++ - Use Arrow Keys to Move", fps );
+
+
+C:\Users\Delran\AppData\Local\atom\bin

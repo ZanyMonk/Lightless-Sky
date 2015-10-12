@@ -124,36 +124,10 @@ void Game::onMouseDown( SDL_Event* evt ) {
 
 void Game::update() {
 
-	if ( keys[SDLK_LEFT] && hero.x > 0 ) {
-		hero.x -= HERO_SPEED;
-	} else if ( keys[SDLK_RIGHT] && (hero.x + hero.size) < E.display.w ) {
-		hero.x += HERO_SPEED;
-	}
-	if ( keys[SDLK_UP] && hero.y > 0 ) {
-		hero.y -= HERO_SPEED;
-	} else if ( keys[SDLK_DOWN] && (hero.y + hero.size) < E.display.h ) {
-		hero.y += HERO_SPEED;
-	}
+		ship.move_to(target_x, target_y);
 
-	if ( is_traveling ) {
-		//calcul distance
-		double Dist_x = (target_x)-(hero.x) ;
-		double Dist_y = (target_y)-(hero.y) ;
-
-		double Radian = atan2(Dist_y,Dist_x);
-
-		hero.x += (cos(Radian)*HERO_SPEED);
-		hero.y += (sin(Radian)*HERO_SPEED);
-
-		//Test fin de course
-		if ( (hero.x==target_x) && (hero.y==target_y) )  {
-
-			is_traveling = 0;
-			hero.x=target_x;
-			hero.y=target_y;
-		}
-	}
 }
+
 
 
 void Game::onKeyDown( SDL_Event* evt ) {

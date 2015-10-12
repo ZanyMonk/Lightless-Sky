@@ -9,7 +9,7 @@ public:
 	~Ship();
 	void draw();
 	void fillRect(SDL_Rect* rc, int r, int g, int b);
-	void move_to(int x, int y);
+	void move_to(int target_x, int target_y);
 	int get_faction();
 	bool is_traveling();
 	Engine E;

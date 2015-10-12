@@ -17,8 +17,9 @@ enum {
 
 bool is_traveling = false;
 
+
 Game::Game( Engine E )
-:E(E), frameSkip(0), running(0), click(false), hero(E) {
+:E(E), frameSkip(0), running(0), click(false), ship(E) {
 }
 
 Game::~Game() {
@@ -35,14 +36,12 @@ void Game::draw() {
 	SDL_SetRenderDrawColor(E.renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(E.renderer);
 
-	hero.draw();
+	ship.draw();
 
 	SDL_RenderPresent(E.renderer);
 }
 
 void Game::stop() {
-	onQuit();
-	running = 0;
 	if (NULL != E.renderer) {
 		SDL_DestroyRenderer(E.renderer);
 		E.renderer = NULL;
@@ -59,20 +58,16 @@ void Game::fillRect(SDL_Rect* rc, int r, int g, int b) {
 	SDL_RenderFillRect(E.renderer, rc);
 }
 
-// void Game::fpsChanged( int fps ) {
-// 	char szFps[ 128 ];
-// 	SDL_SetWindowTitle(E.window, szFps);
-// }
-
-//---
-//- Appelé quand l'événement Quit est activé
-void Game::onQuit()
-{
-
+void Game::fpsChanged( int fps ) {
+	char szFps[ 128 ];
+	std::cout << szFps << "%s: %d FPS" << "SDL2 Base C++ - Use Arrow Keys to Move" << fps << endl ;
+	SDL_SetWindowTitle(E.window, szFps);
 }
 
-//---
-//- Main loop
+void Game::onQuit() {
+	running = 0;
+}
+
 void Game::run() {
 	int past = SDL_GetTicks();
 	int now = past, pastFps = past;
@@ -87,7 +82,8 @@ void Game::run() {
 				case SDL_KEYUP:   onKeyUp( &event );   break;
 				case SDL_MOUSEBUTTONDOWN: onMouseDown( &event );  break;
 				case SDL_MOUSEBUTTONUP:   onMouseUp( &event );    break;
-				case SDL_MOUSEMOTION: break;
+				case SDL_MOUSEMOTION:
+					break;
 			}
 		}
 		// update/draw
@@ -104,7 +100,7 @@ void Game::run() {
 		// fps
 		if ( now - pastFps >= 1000 ) {
 			pastFps = now;
-			// fpsChanged( fps );
+			fpsChanged( fps );
 			fps = 0;
 		}
 		// sleep?
@@ -115,9 +111,8 @@ void Game::run() {
 void Game::onMouseDown( SDL_Event* evt ) {
 	click = true;
 	is_traveling = 1;
-	hero.dep_x = hero.x;
-	hero.dep_y = hero.y;
-
+	ship.dep_x = ship.x;
+	ship.dep_y = ship.y;
 	target_x = evt->button.x;
 	target_y = evt->button.y;
 }
@@ -127,7 +122,6 @@ void Game::update() {
 		ship.move_to(target_x, target_y);
 
 }
-
 
 
 void Game::onKeyDown( SDL_Event* evt ) {

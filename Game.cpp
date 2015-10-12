@@ -117,8 +117,6 @@ void Game::onMouseDown( SDL_Event* evt ) {
 	is_traveling = 1;
 	hero.dep_x = hero.x;
 	hero.dep_y = hero.y;
-	posvaleur=0;
-	targetsupx=0;
 
 	target_x = evt->button.x;
 	target_y = evt->button.y;

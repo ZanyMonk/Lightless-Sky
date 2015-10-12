@@ -16,8 +16,6 @@ enum {
 };
 
 bool is_traveling = false;
-bool targetsupx = 0;
-bool posvaleur = 0;
 
 Game::Game( Engine E )
 :E(E), frameSkip(0), running(0), click(false), hero(E) {
@@ -127,9 +125,6 @@ void Game::onMouseDown( SDL_Event* evt ) {
 }
 
 void Game::update() {
-	if ( keys[SDLK_LALT] && keys[SDLK_F4]) {
-		stop();
-	}
 
 	if ( keys[SDLK_LEFT] && hero.x > 0 ) {
 		hero.x -= HERO_SPEED;
@@ -143,25 +138,25 @@ void Game::update() {
 	}
 
 	if ( is_traveling ) {
-		double Dist_x = target_x - hero.dep_x ;
-		double Dist_y = target_y - hero.dep_y ;
-		double Radian = atan2( Dist_y, Dist_x );
+		//calcul distance
+		double Dist_x = (target_x)-(hero.x) ;
+		double Dist_y = (target_y)-(hero.y) ;
 
-		hero.x += ( cos(Radian)*HERO_SPEED );
-		hero.y += ( sin(Radian)*HERO_SPEED );
+		double Radian = atan2(Dist_y,Dist_x);
 
-		if ( !posvaleur ) {
-			posvaleur = 1;
-			if ( hero.x < target_x )
-				targetsupx = 1;
-		}
-    if ( targetsupx ) {
-			if ( hero.x > target_x )
-				is_traveling = 0;
-    } else if ( hero.x < target_x )
+		hero.x += (cos(Radian)*HERO_SPEED);
+		hero.y += (sin(Radian)*HERO_SPEED);
+
+		//Test fin de course
+		if ( (hero.x==target_x) && (hero.y==target_y) )  {
+
 			is_traveling = 0;
+			hero.x=target_x;
+			hero.y=target_y;
+		}
 	}
 }
+
 
 void Game::onKeyDown( SDL_Event* evt ) {
 	keys[ evt->key.keysym.sym ] = 1;

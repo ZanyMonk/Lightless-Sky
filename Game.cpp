@@ -13,7 +13,7 @@ enum {
 	, DISPLAY_HEIGHT = 320
 	, UPDATE_INTERVAL = 1000/60
 	, HERO_SPEED = 10
-	, NB_SHIPS = 20
+	, NB_SHIPS = 40
 
 };
 

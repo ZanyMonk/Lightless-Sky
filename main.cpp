@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include "SDL2_gfxPrimitives.h"
+#include "Utils.h"
 #include "Engine.h"
 #include "Planet.h"
 #include "Ship.h"

@@ -38,6 +38,7 @@ void Ship::draw()
 	SDL_RenderFillRect(E.renderer, &skin);
 }
 
+<<<<<<< HEAD
 void Ship::update()
 {
 	if ( _is_traveling ) {
@@ -74,8 +75,32 @@ void Ship::head_to(int x, int y)
 // ----
 // Make the ship gravitate around his $attach_point.
 void Ship::gravitate()
+=======
+void Ship::move_to(int target_x, int target_y)
+>>>>>>> fc98453b2e7a21d0323b773cd4bf0e6ab14b9dfb
 {
+		//calcul distance
 
+		_is_traveling = 1;
+
+		if (_is_traveling) {
+
+		double Dist_x = (target_x)-(x) ;
+		double Dist_y = (target_y)-(y) ;
+
+		double Radian = atan2(Dist_y,Dist_x);
+
+		x += (cos(Radian)*SHIP_SPEED);
+		y += (sin(Radian)*SHIP_SPEED);
+
+		//Test fin de course
+		if ( ( x <= target_x+10 && x > target_x-10 ) && ( y <= target_y+10 && y > target_y-10 ) )  {
+
+			_is_traveling = 0;
+			x=target_x;
+			y=target_y;
+			}
+	}
 }
 
 int Ship::get_faction()

@@ -13,8 +13,6 @@ public:
 	void start();
 	void stop();
 	void draw();
-	void fillRect( SDL_Rect* rc, int r, int g, int b );
-	void fpsChanged( int fps );
 	void onQuit();
 	void onKeyDown( SDL_Event* event );
 	void onKeyUp( SDL_Event* event );
@@ -31,6 +29,5 @@ private:
 	int frameSkip;
 	int running ;
 	bool click;
-	// Ship hero;
 	vector<Ship*> ships;
 };

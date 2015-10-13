@@ -17,7 +17,6 @@ enum {
 
 };
 
-<<<<<<< HEAD
 Game::Game( Engine E )
 :E(E), frameSkip(0), running(0), click(false) {
 	for ( int i = 0; i < NB_SHIPS; i++ ) {

@@ -33,16 +33,6 @@ void Game::start() {
 	run();
 }
 
-void Game::draw() {
-	// Clear screen
-	SDL_SetRenderDrawColor(E.renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-	SDL_RenderClear(E.renderer);
-
-	ship.draw();
-
-	SDL_RenderPresent(E.renderer);
-}
-
 void Game::stop() {
 	if (NULL != E.renderer) {
 		SDL_DestroyRenderer(E.renderer);
@@ -52,6 +42,7 @@ void Game::stop() {
 		SDL_DestroyWindow(E.window);
 		E.window = NULL;
 	}
+	running = 0;
 	SDL_Quit();
 }
 
@@ -59,7 +50,7 @@ void Game::stop() {
 //- Appelé quand l'événement Quit est activé
 void Game::onQuit()
 {
-	running = 0;
+
 }
 
 void Game::run() {
@@ -93,7 +84,6 @@ void Game::run() {
 		// fps
 		if ( now - pastFps >= 1000 ) {
 			pastFps = now;
-			fpsChanged( fps );
 			fps = 0;
 		}
 		// sleep?

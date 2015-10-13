@@ -17,6 +17,7 @@ enum {
 
 };
 
+<<<<<<< HEAD
 Game::Game( Engine E )
 :E(E), frameSkip(0), running(0), click(false) {
 	for ( int i = 0; i < NB_SHIPS; i++ ) {
@@ -33,9 +34,17 @@ void Game::start() {
 	run();
 }
 
+void Game::draw() {
+	// Clear screen
+	SDL_SetRenderDrawColor(E.renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+	SDL_RenderClear(E.renderer);
+
+	ship.draw();
+
+	SDL_RenderPresent(E.renderer);
+}
+
 void Game::stop() {
-	onQuit();
-	running = 0;
 	if (NULL != E.renderer) {
 		SDL_DestroyRenderer(E.renderer);
 		E.renderer = NULL;
@@ -51,11 +60,9 @@ void Game::stop() {
 //- Appelé quand l'événement Quit est activé
 void Game::onQuit()
 {
-
+	running = 0;
 }
 
-//---
-//- Main loop
 void Game::run() {
 	int past = SDL_GetTicks();
 	int now = past, pastFps = past;
@@ -87,7 +94,7 @@ void Game::run() {
 		// fps
 		if ( now - pastFps >= 1000 ) {
 			pastFps = now;
-			// fpsChanged( fps );
+			fpsChanged( fps );
 			fps = 0;
 		}
 		// sleep?

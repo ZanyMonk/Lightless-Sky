@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <iostream>
 #include <map>
+#include "SDL2_gfxPrimitives.h"
 #include "Engine.h"
 #include "Planet.h"
 #include "Ship.h"
@@ -23,12 +24,12 @@ int main(int argc, char** argv){
 	if (SDL_CreateWindowAndRenderer(500, 500, flags, &E.window, &E.renderer)) {
 		return 1;
 	}
-	
+
 	E.update_display_mode();
 
 	Game *game = new Game(E);
 	game->start();
 	delete game;
-	
+
 	return 0;
 }

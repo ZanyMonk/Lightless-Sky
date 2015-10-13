@@ -1,37 +1,79 @@
+#include <iostream>
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
 #include <SDL2/SDL.h>
+#include "SDL2_gfxPrimitives.h"
 #include "Ship.h"
 
-const int SHIP_SPEED = 1;
-const char SHIP_COLOR_R = 255;
-const char SHIP_COLOR_G = 0;
-const char SHIP_COLOR_B = 0;
+using namespace std;
+
+const char SHIP_COLOR_R = 200;
+const char SHIP_COLOR_G = 130;
+const char SHIP_COLOR_B = 250;
 
 Ship::Ship(Engine E)
-:E(E), dep_x(0), dep_y(0), x(0), y(0), _is_traveling(true) {
+:E(E), target_x(0), target_y(0), x(0), y(0), _is_traveling(false) {
+	srand(SDL_GetTicks());
 	this->_faction = 0;
-	this->size = 2;
+	this->size = 10;
 	this->_health = 100;
+	this->speed = (rand()%9000)/1000.00+2;
+	SDL_Delay(400);
 }
 
 Ship::~Ship()
 {
 }
 
-
 void Ship::draw()
 {
 	SDL_Rect skin;
-
 	skin.x = x;
 	skin.y = y;
-	skin.w = this->size;
-	skin.h = this->size;
-	
-	SDL_SetRenderDrawColor(E.renderer, SHIP_COLOR_R, SHIP_COLOR_G, SHIP_COLOR_B, SDL_ALPHA_OPAQUE);
+	skin.w = 3;
+	skin.h = 3;
+
+	SDL_SetRenderDrawColor(E.renderer, 0, 0, 255, 255);
 	SDL_RenderFillRect(E.renderer, &skin);
 }
 
-void Ship::move_to(int x, int y)
+void Ship::update()
+{
+	if ( _is_traveling ) {
+		// Calcul distance
+		double Dist_x = target_x - x ;
+		double Dist_y = target_y - y ;
+
+		double Radian = atan2( Dist_y, Dist_x );
+
+		this->x += cos(Radian) * speed;
+		this->y += sin(Radian) * speed;
+
+		// Test de fin de course
+		if (
+					( x <= target_x+speed && x > target_x-speed )
+			&&	( y <= target_y+speed && y > target_y-speed )
+		) {
+			this->_is_traveling = false;
+			this->x = target_x;
+			this->y = target_y;
+		}
+	} else {
+		gravitate();
+	}
+}
+
+void Ship::head_to(int x, int y)
+{
+		this->_is_traveling = true;
+		this->target_x = x;
+		this->target_y = y;
+}
+
+// ----
+// Make the ship gravitate around his $attach_point.
+void Ship::gravitate()
 {
 
 }

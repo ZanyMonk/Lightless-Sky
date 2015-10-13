@@ -1,6 +1,9 @@
+#include <vector>
 #include "Engine.h"
 #include "Planet.h"
 #include "Ship.h"
+
+using namespace std;
 
 class Game
 {
@@ -15,6 +18,7 @@ public:
 	void onQuit();
 	void onKeyDown( SDL_Event* event );
 	void onKeyUp( SDL_Event* event );
+	void onMouseMotion( SDL_Event* event );
 	void onMouseDown( SDL_Event* event );
 	void onMouseUp( SDL_Event* event );
 	void run();
@@ -27,6 +31,6 @@ private:
 	int frameSkip;
 	int running ;
 	bool click;
-	Ship hero;
-	// Ship ship[100];
+	// Ship hero;
+	vector<Ship*> ships;
 };

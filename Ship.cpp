@@ -19,7 +19,7 @@ Ship::Ship(Engine E)
 	size = 10;
 	speed = random(5, 15);
 	_health = 100;
-	SDL_Delay(100);
+	SDL_Delay(1);
 }
 
 Ship::~Ship()
@@ -56,8 +56,8 @@ void Ship::update()
 			&&	( pos.y <= target.y+speed && pos.y > target.y-speed )
 		) {
 			_is_traveling = false;
-			pos.x = target.x;
-			pos.y = target.y;
+			pos = target;
+			attach_point = pos;
 		}
 	} else {
 		gravitate();
@@ -66,8 +66,7 @@ void Ship::update()
 
 void Ship::head_to(int x, int y)
 {
-		target.x = x;
-		target.y = y;
+		target._set(x, y);
 		_is_traveling = true;
 }
 
@@ -75,5 +74,6 @@ void Ship::head_to(int x, int y)
 // Make the ship gravitate around his $attach_point.
 void Ship::gravitate()
 {
-	// pos.x = attach_point.x;
+	// cout << (cos(SDL_GetTicks()/40)*50) << endl;
+	// pos.x = attach_point.x + sin(SDL_GetTicks())*80;
 }

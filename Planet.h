@@ -6,8 +6,7 @@ class Planet
 public:
 	Planet();
 	~Planet();
-	int x, y;
-	int dep_x, dep_y;
+	Point pos;
 };
 
 #endif

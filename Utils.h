@@ -10,9 +10,11 @@ public:
   Point ( int x, int y );
   Point ();
   ~Point ();
+  void _set ( int new_x, int new_y );
+  Point operator= ( Point p );
+
   int x, y;
 private:
-
 };
 
 static int random(int a, int b=0)

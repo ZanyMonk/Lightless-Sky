@@ -14,3 +14,15 @@ Point::Point()
 Point::~Point()
 {
 }
+
+void Point::_set(int new_x, int new_y)
+{
+  x = new_x;
+  y = new_y;
+}
+
+Point Point::operator=(Point p)
+{
+  x = p.x;
+  y = p.y;
+}

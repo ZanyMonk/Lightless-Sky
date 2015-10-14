@@ -2,6 +2,7 @@
 #include <iostream>
 #include <math.h>
 #include <map>
+#include "Utils.h"
 #include "Game.h"
 
 #define ARRAY_SIZE(array) (sizeof((array))/sizeof((array[0])))
@@ -13,7 +14,7 @@ enum {
 	, DISPLAY_HEIGHT = 320
 	, UPDATE_INTERVAL = 1000/60
 	, HERO_SPEED = 10
-	, NB_SHIPS = 40
+	, NB_SHIPS = 1
 
 };
 
@@ -26,6 +27,10 @@ Game::Game( Engine E )
 
 Game::~Game() {
 	this->stop();
+
+	for ( int i = 0; i < NB_SHIPS; i++ ) {
+		delete ships[i];
+	}
 }
 
 void Game::start() {
@@ -72,7 +77,7 @@ void Game::run() {
 		}
 		// update/draw
 		timeElapsed = (now=SDL_GetTicks()) - past;
-		if ( timeElapsed >= UPDATE_INTERVAL  ) {
+		if ( timeElapsed >= UPDATE_INTERVAL ) {
 			past = now;
 			update();
 			if ( framesSkipped++ >= frameSkip ) {
@@ -87,7 +92,7 @@ void Game::run() {
 			fps = 0;
 		}
 		// sleep?
-		SDL_Delay( 9 );
+		SDL_Delay( 10 );
 	}
 }
 

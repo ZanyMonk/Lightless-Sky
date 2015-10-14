@@ -1,5 +1,14 @@
 #ifndef SHIP_H
+
 #define SHIP_H
+#define _USE_MATH_DEFINES
+
+#include <iostream>
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
+#include <SDL2/SDL.h>
+#include "SDL2_gfxPrimitives.h"
 #include "Engine.h"
 #include "Utils.h"
 

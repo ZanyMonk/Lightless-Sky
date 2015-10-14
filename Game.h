@@ -1,4 +1,9 @@
 #include <vector>
+#include <iostream>
+#include <math.h>
+#include <SDL2/SDL.h>
+#include <map>
+#include "Utils.h"
 #include "Engine.h"
 #include "Planet.h"
 #include "Ship.h"
@@ -30,4 +35,5 @@ private:
 	int running ;
 	bool click;
 	vector<Ship*> ships;
+	Planet planet;
 };

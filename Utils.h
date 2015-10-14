@@ -17,9 +17,4 @@ public:
 private:
 };
 
-static int random(int a, int b=0)
-{
-  return rand()%(a-b)+a;
-}
-
 #endif

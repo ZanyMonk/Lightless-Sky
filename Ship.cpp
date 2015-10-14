@@ -1,12 +1,4 @@
-#define _USE_MATH_DEFINES
-#include <iostream>
-#include <stdlib.h>
-#include <math.h>
-#include <time.h>
-#include <SDL2/SDL.h>
-#include "SDL2_gfxPrimitives.h"
 #include "Ship.h"
-#include "Utils.h"
 
 using namespace std;
 
@@ -77,6 +69,6 @@ void Ship::gravitate()
 {
 	int step = SDL_GetTicks();
 	// cout << (cos(step/40)*50) << endl;
-	pos.x = attach_point.x + sin(step/(20*speed)) * (100);
-	pos.y = attach_point.y + cos(step/(20*speed)) * (15);
+	pos.x = attach_point.x + (sin(step/(20*speed))-cos(step/(20*speed))) * (50);
+	pos.y = attach_point.y + (cos(step/(20*speed))-sin(step/(20*speed))*4) * (15);
 }

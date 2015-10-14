@@ -1,8 +1,3 @@
-#include <SDL2/SDL.h>
-#include <iostream>
-#include <math.h>
-#include <map>
-#include "Utils.h"
 #include "Game.h"
 
 #define ARRAY_SIZE(array) (sizeof((array))/sizeof((array[0])))
@@ -14,12 +9,12 @@ enum {
 	, DISPLAY_HEIGHT = 320
 	, UPDATE_INTERVAL = 1000/60
 	, HERO_SPEED = 10
-	, NB_SHIPS = 1
+	, NB_SHIPS = 20
 
 };
 
 Game::Game( Engine E )
-:E(E), frameSkip(0), running(0), click(false) {
+:E(E), frameSkip(0), running(0), click(false), planet(E) {
 	for ( int i = 0; i < NB_SHIPS; i++ ) {
 		ships.push_back(new Ship(E));
 	}
@@ -78,6 +73,7 @@ void Game::run() {
 		// update/draw
 		timeElapsed = (now=SDL_GetTicks()) - past;
 		if ( timeElapsed >= UPDATE_INTERVAL ) {
+			cout << past << " " << timeElapsed << endl;
 			past = now;
 			update();
 			if ( framesSkipped++ >= frameSkip ) {
@@ -117,6 +113,8 @@ void Game::draw() {
 	for ( unsigned i = 0; i < ships.size(); i++ ) {
 		ships.at(i)->draw();
 	}
+
+	planet.draw();
 
 	SDL_RenderPresent(E.renderer);
 }

@@ -8,7 +8,7 @@ Point::Point(int x, int y)
 }
 
 Point::Point()
-:x(NULL), y(NULL) {
+:x(-1), y(-1) {
 }
 
 Point::~Point()

@@ -4,6 +4,7 @@
 #include <map>
 #include <stdlib.h>
 #include "SDL2_gfxPrimitives.h"
+#include "SDL2_gfxPrimitives_font.h"
 #include "Utils.h"
 #include "Engine.h"
 #include "Planet.h"
@@ -14,6 +15,8 @@ using namespace std;
 
 int main(int argc, char** argv){
 	Engine E;
+
+	gfxPrimitivesSetFont(gfxPrimitivesFontdata, 7, 7);
 
 	int flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {

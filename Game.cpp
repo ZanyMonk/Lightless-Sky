@@ -10,9 +10,12 @@ enum {
 };
 
 Game::Game( Engine E )
-:E(E), frameSkip(0), running(0), click(false), planet(E) {
+:E(E), frameSkip(0), running(0), click(false) {
+	planets.push_back(new Planet(E, 500, 400, 20.0));
+	planets.push_back(new Planet(E, 900, 400, 20.0));
+
 	for ( int i = 0; i < NB_SHIPS; i++ ) {
-		ships.push_back(new Ship(E, planet));
+		ships.push_back(new Ship(E, *planets[0]));
 	}
 }
 
@@ -101,11 +104,15 @@ void Game::update() {
 
 void Game::draw() {
 	// Clear screen
-	SDL_SetRenderDrawColor(E.renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+	SDL_SetRenderDrawColor(E.renderer, 25, 25, 25, 255);
 	SDL_RenderClear(E.renderer);
 
+	stringRGBA(E.renderer, 20, 20, "abcdefghijklmnopqrstuvwxyz", 255, 255, 255, 255);
+
 	// Draw all planets
-	planet.draw();
+	for ( unsigned i = 0; i < planets.size(); i++ ) {
+		planets.at(i)->draw();
+	}
 
 	// Draw all ships
 	for ( unsigned i = 0; i < ships.size(); i++ ) {
@@ -117,19 +124,26 @@ void Game::draw() {
 
 void Game::onMouseMotion( SDL_Event* evt ) {
 
-	if ( click ) {
-		for ( unsigned i = 0; i < ships.size(); i++ ) {
-			ships.at(i)->head_to(evt->button.x, evt->button.y);
-		}
-	}
+	// if ( click ) {
+	// 	for ( unsigned i = 0; i < ships.size(); i++ ) {
+	// 		ships.at(i)->head_to(evt->button.x, evt->button.y);
+	// 	}
+	// }
 
 }
 
 void Game::onMouseDown( SDL_Event* evt ) {
 	click = true;
 
-	for ( unsigned i = 0; i < ships.size(); i++ ) {
-		ships.at(i)->head_to(evt->button.x, evt->button.y);
+	for (unsigned j = 0; j < planets.size(); j++) {
+		if (
+			pow( planets.at(j)->pos.x - evt->button.x, 2 ) + pow( planets.at(j)->pos.y - evt->button.y, 2 )
+				< pow( planets.at(j)->size, 2 )
+		) {
+			for ( unsigned i = 0; i < ships.size(); i++ ) {
+				ships.at(i)->head_to(*planets.at(j));
+			}
+		}
 	}
 
 }

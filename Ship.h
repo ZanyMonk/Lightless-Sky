@@ -20,7 +20,7 @@ public:
 	~Ship();
 	void draw();
 	void update();
-	void head_to(int x, int y);
+	void head_to( Planet new_planet );
 	void gravitate();
 	Engine E;
 	Planet planet;

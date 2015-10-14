@@ -9,8 +9,8 @@ const char SHIP_COLOR_B = 250;
 Ship::Ship(Engine E, Planet planet)
 :E(E), planet(planet), target(Point()), pos(Point(0,0)), _is_traveling(false) {
 	srand(SDL_GetTicks());
-	size = 3.0;
-	speed = fmod( rand()/1000, 10)+5;
+	size = 1.0;
+	speed = 3;
 	_health = 100;
 	SDL_Delay(1);
 }
@@ -27,9 +27,10 @@ void Ship::draw()
 		|| pow( pos.x - planet.pos.x, 2 ) + pow( pos.y - planet.pos.y, 2 )
 				> pow( planet.size+ size/2, 2) )
 	{
+		double r = 3.0;
 	  filledCircleRGBA(
 	    E.renderer,
-	    pos.x + 1, pos.y + 1, 3,
+	    pos.x + r/2, pos.y + r/2, r,
 			255, 255, 255,
 	    fabs( sin(SDL_GetTicks()) / 2.5 ) * 90
 	  );
@@ -37,7 +38,7 @@ void Ship::draw()
 		boxRGBA(
 			E.renderer,
 			pos.x, pos.y,
-			pos.x + 2, pos.y + 2,
+			pos.x + size, pos.y + size,
 			255, 255, 255, 255
 		);
 	}
@@ -70,9 +71,10 @@ void Ship::update()
 	}
 }
 
-void Ship::head_to(int x, int y)
+void Ship::head_to(Planet new_planet)
 {
-		target._set(x, y);
+		target._set(new_planet.pos.x, new_planet.pos.y);
+		planet = new_planet;
 		_is_traveling = true;
 }
 

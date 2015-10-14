@@ -35,5 +35,5 @@ private:
 	int running ;
 	bool click;
 	vector<Ship*> ships;
-	Planet planet;
+	vector<Planet*> planets;
 };

@@ -6,11 +6,11 @@ const char SHIP_COLOR_R = 200;
 const char SHIP_COLOR_G = 130;
 const char SHIP_COLOR_B = 250;
 
-Ship::Ship(Engine E)
-:E(E), target(Point()), pos(Point(0,0)), attach_point(Point(500,500)), _is_traveling(false) {
+Ship::Ship(Engine E, Planet planet)
+:E(E), planet(planet), target(Point()), pos(Point(0,0)), _is_traveling(false) {
 	srand(SDL_GetTicks());
-	size = 10;
-	speed = rand()%10+5;
+	size = 3.0;
+	speed = fmod( rand()/1000, 10)+5;
 	_health = 100;
 	SDL_Delay(1);
 }
@@ -21,14 +21,27 @@ Ship::~Ship()
 
 void Ship::draw()
 {
-	SDL_Rect skin;
-	skin.x = pos.x;
-	skin.y = pos.y;
-	skin.w = 3;
-	skin.h = 3;
 
-	SDL_SetRenderDrawColor(E.renderer, 0, 0, 255, 255);
-	SDL_RenderFillRect(E.renderer, &skin);
+	if (
+		sin(SDL_GetTicks() / ( 20 * ( 20-speed ) )) > 0
+		|| pow( pos.x - planet.pos.x, 2 ) + pow( pos.y - planet.pos.y, 2 )
+				> pow( planet.size+ size/2, 2) )
+	{
+	  filledCircleRGBA(
+	    E.renderer,
+	    pos.x + 1, pos.y + 1, 3,
+			255, 255, 255,
+	    fabs( sin(SDL_GetTicks()) / 2.5 ) * 90
+	  );
+
+		boxRGBA(
+			E.renderer,
+			pos.x, pos.y,
+			pos.x + 2, pos.y + 2,
+			255, 255, 255, 255
+		);
+	}
+
 }
 
 void Ship::update()
@@ -68,7 +81,6 @@ void Ship::head_to(int x, int y)
 void Ship::gravitate()
 {
 	int step = SDL_GetTicks();
-	// cout << (cos(step/40)*50) << endl;
-	pos.x = attach_point.x + (sin(step/(20*speed))-cos(step/(20*speed))) * (50);
-	pos.y = attach_point.y + (cos(step/(20*speed))-sin(step/(20*speed))*4) * (15);
+	pos.x = planet.pos.x + cos(step/(20*(20-speed))) * (planet.size*2);
+	pos.y = planet.pos.y + (cos(step/(20*(20-speed)))/2 + sin(step/(20*(20-speed)))) * (15);
 }

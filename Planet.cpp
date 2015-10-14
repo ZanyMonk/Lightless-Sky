@@ -1,11 +1,11 @@
 #include "Planet.h"
 
 Planet::Planet(Engine E)
-:E(E), pos(Point(50,50)) {
+:E(E), pos(Point(500,500)), size(20.0) {
 }
 
-Planet::Planet(Engine E, Point pos)
-:E(E), pos(pos) {
+Planet::Planet(Engine E, Point pos, float size)
+:E(E), pos(pos), size(20.0) {
 }
 
 Planet::~Planet() {
@@ -13,12 +13,11 @@ Planet::~Planet() {
 
 void Planet::draw()
 {
-	SDL_Rect skin;
-	skin.x = pos.x;
-	skin.y = pos.y;
-	skin.w = 10;
-	skin.h = 10;
 
-	SDL_SetRenderDrawColor(E.renderer, 255, 0, 0, 255);
-	SDL_RenderFillRect(E.renderer, &skin);
+  filledCircleRGBA(
+    E.renderer,
+    pos.x, pos.y, size,
+    101, 98, 92, 255
+  );
+
 }

@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include <iostream>
 #include <stdlib.h>
 #include <math.h>
@@ -14,10 +15,10 @@ const char SHIP_COLOR_G = 130;
 const char SHIP_COLOR_B = 250;
 
 Ship::Ship(Engine E)
-:E(E), target(Point()), pos(Point(0,0)), attach_point(Point(50,50)), _is_traveling(false) {
+:E(E), target(Point()), pos(Point(0,0)), attach_point(Point(500,500)), _is_traveling(false) {
 	srand(SDL_GetTicks());
 	size = 10;
-	speed = random(5, 15);
+	speed = rand()%10+5;
 	_health = 100;
 	SDL_Delay(1);
 }
@@ -74,6 +75,8 @@ void Ship::head_to(int x, int y)
 // Make the ship gravitate around his $attach_point.
 void Ship::gravitate()
 {
-	// cout << (cos(SDL_GetTicks()/40)*50) << endl;
-	// pos.x = attach_point.x + sin(SDL_GetTicks())*80;
+	int step = SDL_GetTicks();
+	// cout << (cos(step/40)*50) << endl;
+	pos.x = attach_point.x + sin(step/(20*speed)) * (100);
+	pos.y = attach_point.y + cos(step/(20*speed)) * (15);
 }

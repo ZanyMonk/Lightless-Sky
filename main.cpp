@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <iostream>
 #include <map>
+#include <stdlib.h>
 #include "SDL2_gfxPrimitives.h"
 #include "Utils.h"
 #include "Engine.h"
@@ -11,12 +12,8 @@
 
 using namespace std;
 
-
 int main(int argc, char** argv){
 	Engine E;
-
-	// SDL_Window* window1;
-	// SDL_Renderer* renderer1;
 
 	int flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {

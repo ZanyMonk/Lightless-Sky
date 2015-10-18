@@ -2,6 +2,7 @@
 #include <iostream>
 #include <math.h>
 #include <SDL2/SDL.h>
+#include "SDL2_gfxPrimitives.h"
 #include <map>
 #include "Utils.h"
 #include "Engine.h"
@@ -13,7 +14,7 @@ using namespace std;
 class Game
 {
 public:
-	Game( Engine E );
+	Game( Engine* E );
 	~Game();
 	void start();
 	void stop();
@@ -27,7 +28,7 @@ public:
 	void run();
 	void update();
 private:
-	Engine E;
+	Engine* E;
 	std::map<int,int> keys;
 	int target_x;
 	int target_y;
@@ -35,5 +36,5 @@ private:
 	int running ;
 	bool click;
 	vector<Ship*> ships;
-	Planet planet;
+	vector<Planet*> planets;
 };

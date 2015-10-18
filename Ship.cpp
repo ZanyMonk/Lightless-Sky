@@ -6,11 +6,12 @@ const char SHIP_COLOR_R = 200;
 const char SHIP_COLOR_G = 130;
 const char SHIP_COLOR_B = 250;
 
-Ship::Ship(Engine E)
-:E(E), target(Point()), pos(Point(0,0)), attach_point(Point(500,500)), _is_traveling(false) {
-	srand(SDL_GetTicks());
-	size = 10;
-	speed = rand()%10+5;
+Ship::Ship(Engine* E, Planet planet)
+:E(E), planet(planet), target(Point()), pos(Point(0,0)), _is_traveling(false) {
+	seed = SDL_GetTicks();
+	srand(seed);
+	size = 1.0;
+	speed = 3;
 	_health = 100;
 	SDL_Delay(1);
 }
@@ -21,19 +22,38 @@ Ship::~Ship()
 
 void Ship::draw()
 {
-	SDL_Rect skin;
-	skin.x = pos.x;
-	skin.y = pos.y;
-	skin.w = 3;
-	skin.h = 3;
 
-	SDL_SetRenderDrawColor(E.renderer, 0, 0, 255, 255);
-	SDL_RenderFillRect(E.renderer, &skin);
+	if (
+		sin(SDL_GetTicks() / ( 20 * ( 20-speed ) )) > 0
+		|| pow( pos.x - planet.pos.x, 2 ) + pow( pos.y - planet.pos.y, 2 )
+				> pow( planet.size+ size/2, 2) )
+	{
+		double r = 3.0;
+	  filledCircleRGBA(
+	    E->renderer,
+	    pos.x + r/2, pos.y + r/2, r,
+			255, 255, 255,
+	    fabs( sin(SDL_GetTicks()) / 2.5 ) * 90
+	  );
+
+		boxRGBA(
+			E->renderer,
+			pos.x, pos.y,
+			pos.x + size, pos.y + size,
+			255, 255, 255, 255
+		);
+	}
+
 }
 
 void Ship::update()
 {
 	if ( _is_traveling ) {
+		// Recalcul du point d'arrivée
+		int step = SDL_GetTicks();
+		target.x = planet.pos.x + cos(step/(20*(20-speed))) * (planet.size*2+(sin(step/(20*(20-speed)))));
+		target.y = planet.pos.y + (cos(step/(20*(20-speed)))/2 + sin(step/(20*(20-speed)))) * (15);
+
 		// Calcul distance
 		double Dist_x = target.x - pos.x ;
 		double Dist_y = target.y - pos.y ;
@@ -45,8 +65,8 @@ void Ship::update()
 
 		// Test de fin de course
 		if (
-					( pos.x <= target.x+speed && pos.x > target.x-speed )
-			&&	( pos.y <= target.y+speed && pos.y > target.y-speed )
+					( pos.x <= target.x+speed/2 && pos.x > target.x-speed/2 )
+			&&	( pos.y <= target.y+speed/2 && pos.y > target.y-speed/2 )
 		) {
 			_is_traveling = false;
 			pos = target;
@@ -57,18 +77,19 @@ void Ship::update()
 	}
 }
 
-void Ship::head_to(int x, int y)
+// Sélectionne un nouveau cap
+void Ship::head_to(Planet new_planet)
 {
-		target._set(x, y);
+		target._set(new_planet.pos.x, new_planet.pos.y);
+		planet = new_planet;
 		_is_traveling = true;
 }
 
 // ----
-// Make the ship gravitate around his $attach_point.
+// Le vaisseau gravite autour de sa planète
 void Ship::gravitate()
 {
 	int step = SDL_GetTicks();
-	// cout << (cos(step/40)*50) << endl;
-	pos.x = attach_point.x + (sin(step/(20*speed))-cos(step/(20*speed))) * (50);
-	pos.y = attach_point.y + (cos(step/(20*speed))-sin(step/(20*speed))*4) * (15);
+	pos.x = planet.pos.x + cos(step/(20*(20-speed))) * (planet.size*2+sin(step/(20*(20-speed))));
+	pos.y = planet.pos.y + (cos(step/(20*(20-speed)))/2 + sin(step/(20*(20-speed)))/10) * (15);
 }

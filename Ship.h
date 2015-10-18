@@ -11,21 +11,25 @@
 #include "SDL2_gfxPrimitives.h"
 #include "Engine.h"
 #include "Utils.h"
+#include "Planet.h"
 
 class Ship
 {
 public:
-	Ship( Engine E );
+	Ship( Engine* E, Planet planet );
 	~Ship();
 	void draw();
 	void update();
-	void head_to(int x, int y);
+	void head_to( Planet new_planet );
 	void gravitate();
-	Engine E;
+
+	Engine* E;
+	Planet planet;
 	Point target;
 	Point pos;
 	Point attach_point;
-	int size;
+	int seed;
+	double size;
 	double speed;
 	bool _is_traveling;
 private:

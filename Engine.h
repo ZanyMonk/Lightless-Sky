@@ -1,6 +1,10 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include <SDL2/SDL.h>
+#include <iostream>
+#include "Utils.h"
+
 class Engine
 {
 public:
@@ -10,6 +14,7 @@ public:
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 	SDL_DisplayMode display;
+	Point cursor;
 };
 
 #endif

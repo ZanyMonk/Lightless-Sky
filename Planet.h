@@ -8,13 +8,14 @@
 class Planet
 {
 public:
+	Engine E;
+	Point pos;
 	Planet( Engine E );
 	Planet( Engine E, Point pos );
 	~Planet();
 	void draw();
 
-	Point pos;
-	Engine E;
+
 private:
 };
 

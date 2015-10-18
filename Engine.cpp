@@ -1,11 +1,10 @@
-#include <SDL2/SDL.h>
-#include <iostream>
 #include "Engine.h"
 
 using namespace std;
 
 Engine::Engine()
 {
+	cursor = Point(0,0);
 }
 
 Engine::~Engine()

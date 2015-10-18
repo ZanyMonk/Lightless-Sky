@@ -6,9 +6,10 @@ const char SHIP_COLOR_R = 200;
 const char SHIP_COLOR_G = 130;
 const char SHIP_COLOR_B = 250;
 
-Ship::Ship(Engine E, Planet planet)
+Ship::Ship(Engine* E, Planet planet)
 :E(E), planet(planet), target(Point()), pos(Point(0,0)), _is_traveling(false) {
-	srand(SDL_GetTicks());
+	seed = SDL_GetTicks();
+	srand(seed);
 	size = 1.0;
 	speed = 3;
 	_health = 100;
@@ -29,14 +30,14 @@ void Ship::draw()
 	{
 		double r = 3.0;
 	  filledCircleRGBA(
-	    E.renderer,
+	    E->renderer,
 	    pos.x + r/2, pos.y + r/2, r,
 			255, 255, 255,
 	    fabs( sin(SDL_GetTicks()) / 2.5 ) * 90
 	  );
 
 		boxRGBA(
-			E.renderer,
+			E->renderer,
 			pos.x, pos.y,
 			pos.x + size, pos.y + size,
 			255, 255, 255, 255
@@ -48,6 +49,11 @@ void Ship::draw()
 void Ship::update()
 {
 	if ( _is_traveling ) {
+		// Recalcul du point d'arrivée
+		int step = SDL_GetTicks();
+		target.x = planet.pos.x + cos(step/(20*(20-speed))) * (planet.size*2+(sin(step/(20*(20-speed)))));
+		target.y = planet.pos.y + (cos(step/(20*(20-speed)))/2 + sin(step/(20*(20-speed)))) * (15);
+
 		// Calcul distance
 		double Dist_x = target.x - pos.x ;
 		double Dist_y = target.y - pos.y ;
@@ -59,8 +65,8 @@ void Ship::update()
 
 		// Test de fin de course
 		if (
-					( pos.x <= target.x+speed && pos.x > target.x-speed )
-			&&	( pos.y <= target.y+speed && pos.y > target.y-speed )
+					( pos.x <= target.x+speed/2 && pos.x > target.x-speed/2 )
+			&&	( pos.y <= target.y+speed/2 && pos.y > target.y-speed/2 )
 		) {
 			_is_traveling = false;
 			pos = target;
@@ -71,6 +77,7 @@ void Ship::update()
 	}
 }
 
+// Sélectionne un nouveau cap
 void Ship::head_to(Planet new_planet)
 {
 		target._set(new_planet.pos.x, new_planet.pos.y);
@@ -79,10 +86,10 @@ void Ship::head_to(Planet new_planet)
 }
 
 // ----
-// Make the ship gravitate around his $attach_point.
+// Le vaisseau gravite autour de sa planète
 void Ship::gravitate()
 {
 	int step = SDL_GetTicks();
-	pos.x = planet.pos.x + cos(step/(20*(20-speed))) * (planet.size*2);
-	pos.y = planet.pos.y + (cos(step/(20*(20-speed)))/2 + sin(step/(20*(20-speed)))) * (15);
+	pos.x = planet.pos.x + cos(step/(20*(20-speed))) * (planet.size*2+sin(step/(20*(20-speed))));
+	pos.y = planet.pos.y + (cos(step/(20*(20-speed)))/2 + sin(step/(20*(20-speed)))/10) * (15);
 }

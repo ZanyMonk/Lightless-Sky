@@ -16,17 +16,19 @@
 class Ship
 {
 public:
-	Ship( Engine E, Planet planet );
+	Ship( Engine* E, Planet planet );
 	~Ship();
 	void draw();
 	void update();
 	void head_to( Planet new_planet );
 	void gravitate();
-	Engine E;
+
+	Engine* E;
 	Planet planet;
 	Point target;
 	Point pos;
 	Point attach_point;
+	int seed;
 	double size;
 	double speed;
 	bool _is_traveling;

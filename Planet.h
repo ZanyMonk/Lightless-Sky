@@ -14,14 +14,16 @@ using namespace std;
 class Planet
 {
 public:
-	Planet( Engine E );
-	Planet( Engine E, int x, int y, float size );
+	Planet( Engine* E );
+	Planet( Engine* E, int x, int y, float size );
 	~Planet();
 	void draw();
+	void draw_glow();
 
-	Engine E;
+	Engine* E;
 	Point pos;
 	float size;
+	int hover;
 private:
 };
 

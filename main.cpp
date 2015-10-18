@@ -14,21 +14,19 @@
 using namespace std;
 
 int main(int argc, char** argv){
-	Engine E;
-
-	gfxPrimitivesSetFont(gfxPrimitivesFontdata, 7, 7);
+	Engine* E = new Engine;
 
 	int flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {
 		return 1;
 	}
-	if (SDL_CreateWindowAndRenderer(500, 500, flags, &E.window, &E.renderer)) {
+	if (SDL_CreateWindowAndRenderer(500, 500, flags, &E->window, &E->renderer)) {
 		return 1;
 	}
 
-	E.update_display_mode();
+	E->update_display_mode();
 
-	Game *game = new Game(E);
+	Game* game = new Game(E);
 	game->start();
 	delete game;
 

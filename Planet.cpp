@@ -6,6 +6,10 @@ Planet::Planet(Engine* E)
 :E(E), pos(Point(500,500)), size(20.0), hover(0) {
 }
 
+Planet::Planet(Engine* E, Point position, float size)
+:E(E), pos(position), size(size), hover(0) {
+}
+
 Planet::Planet(Engine* E, int x, int y, float size)
 :E(E), pos(Point(x, y)), size(size), hover(0) {
 }

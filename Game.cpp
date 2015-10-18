@@ -12,7 +12,7 @@ enum {
 
 Game::Game( Engine* E )
 :E(E), frameSkip(0), running(0), click(false) {
-	planets.push_back(new Planet(E, 500, 200, 20.0));
+	planets.push_back(new Planet(E, Point(500, 200), 20.0));
 	planets.push_back(new Planet(E, 900, 400, 40.0));
 
 	for ( int i = 0; i < NB_SHIPS; i++ ) {

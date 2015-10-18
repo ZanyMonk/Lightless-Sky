@@ -16,6 +16,7 @@ class Planet
 public:
 	Planet( Engine* E );
 	Planet( Engine* E, int x, int y, float size );
+	Planet( Engine* E, Point position, float size );
 	~Planet();
 	void draw();
 	void draw_glow();

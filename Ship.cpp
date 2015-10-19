@@ -10,6 +10,7 @@ Ship::Ship(Engine* E, Planet planet)
 :E(E), planet(planet), target(Point()), pos(Point(0,0)), _is_traveling(false) {
 	seed = SDL_GetTicks();
 	srand(seed);
+	seed = rand();
 	size = 1.0;
 	speed = 3;
 	_health = 100;
@@ -23,11 +24,15 @@ Ship::~Ship()
 void Ship::draw()
 {
 
+	// We hide the ship if it is behind the planet
 	if (
-		sin(SDL_GetTicks() / ( 20 * ( 20-speed ) )) > 0
-		|| pow( pos.x - planet.pos.x, 2 ) + pow( pos.y - planet.pos.y, 2 )
-				> pow( planet.size+ size/2, 2) )
-	{
+		_is_traveling
+		|| (
+			sin((SDL_GetTicks()-seed%1000) / ( 20 * ( 20-speed/1.5 ) )) > 0
+			|| pow( pos.x - planet.pos.x, 2 ) + pow( pos.y - planet.pos.y, 2 )
+					> pow( planet.size + size/2, 2)
+		)
+	) {
 		double r = 3.0;
 	  filledCircleRGBA(
 	    E->renderer,
@@ -50,9 +55,11 @@ void Ship::update()
 {
 	if ( _is_traveling ) {
 		// Recalcul du point d'arrivée
-		int step = SDL_GetTicks();
-		target.x = planet.pos.x + cos(step/(20*(20-speed))) * (planet.size*2+(sin(step/(20*(20-speed)))));
-		target.y = planet.pos.y + (cos(step/(20*(20-speed)))/2 + sin(step/(20*(20-speed)))) * (15);
+		int step = SDL_GetTicks()-seed%1000;
+		float S = sin((step-seed%1000)/((20-seed%5)*(20-speed/1.5)))*2;
+		float C = cos(step/(20*(20-speed/1.5)));
+		target.x = planet.pos.x + C * (planet.size*2+S*10);
+		target.y = planet.pos.y + (C/2 + S/10) * (15+seed%int(planet.size*2));
 
 		// Calcul distance
 		double Dist_x = target.x - pos.x ;
@@ -89,7 +96,9 @@ void Ship::head_to(Planet new_planet)
 // Le vaisseau gravite autour de sa planète
 void Ship::gravitate()
 {
-	int step = SDL_GetTicks();
-	pos.x = planet.pos.x + cos(step/(20*(20-speed))) * (planet.size*2+sin(step/(20*(20-speed))));
-	pos.y = planet.pos.y + (cos(step/(20*(20-speed)))/2 + sin(step/(20*(20-speed)))/10) * (15);
+	int step = SDL_GetTicks()-seed%1000;
+	float S = sin((step-seed%1000)/((20-seed%5)*(20-speed/1.5)))*2;
+	float C = cos(step/(20*(20-speed/1.5)));
+	pos.x = planet.pos.x + C * (planet.size*2+S*10);
+	pos.y = planet.pos.y + (C/2 + S/10) * (15+seed%int(planet.size*2));
 }

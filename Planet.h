@@ -20,11 +20,13 @@ public:
 	~Planet();
 	void draw();
 	void draw_glow();
+	void draw_options();
 
 	Engine* E;
 	Point pos;
 	float size;
 	int hover;
+	int focus;
 private:
 };
 

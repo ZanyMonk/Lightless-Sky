@@ -27,6 +27,7 @@ public:
 	void onMouseUp( SDL_Event* event );
 	void run();
 	void update();
+	void clearPlanetsFocus( SDL_Event* evt );
 private:
 	Engine* E;
 	std::map<int,int> keys;

@@ -1,18 +1,22 @@
 #include "Game.h"
-#include "SDL2_gfxPrimitives_font.h"
+// #include "SDL2_gfxPrimitives_font.h"
 
 #define ARRAY_SIZE(array) (sizeof((array))/sizeof((array[0])))
+
+const int BG_COLOR[] = {25,25,25};
 
 using namespace std;
 
 enum {
 	UPDATE_INTERVAL = 1000/60
-	, NB_SHIPS = 1
+	, NB_SHIPS = 10
 };
 
 Game::Game( Engine* E )
 :E(E), frameSkip(0), running(0), click(false) {
 	planets.push_back(new Planet(E, Point(500, 200), 20.0));
+	planets.push_back(new Planet(E, Point(1000, 400), 20.0));
+	planets.push_back(new Planet(E, Point(700, 750), 20.0));
 	planets.push_back(new Planet(E, 900, 400, 40.0));
 
 	for ( int i = 0; i < NB_SHIPS; i++ ) {
@@ -58,6 +62,14 @@ void Game::run() {
 	int now = past, pastFps = past;
 	int fps = 0, framesSkipped = 0;
 	SDL_Event event;
+
+	boxRGBA(
+		E->renderer,
+		0, 0,
+		E->display.w, E->display.h,
+		BG_COLOR[0], BG_COLOR[1], BG_COLOR[2], 255
+	);
+
 	while ( running ) {
 		int timeElapsed = 0;
 		if (SDL_PollEvent(&event)) {
@@ -105,8 +117,14 @@ void Game::update() {
 
 void Game::draw() {
 	// Clear screen
-	SDL_SetRenderDrawColor(E->renderer, 25, 25, 25, 255);
-	SDL_RenderClear(E->renderer);
+	SDL_SetRenderDrawColor(E->renderer, BG_COLOR[0], BG_COLOR[1], BG_COLOR[2], 50);
+	// SDL_RenderClear(E->renderer);
+	boxRGBA(
+		E->renderer,
+		0, 0,
+		E->display.w, E->display.h,
+		BG_COLOR[0], BG_COLOR[1], BG_COLOR[2], 120
+	);
 
 	// char str[256];
 	//
@@ -135,12 +153,6 @@ void Game::draw() {
 
 void Game::onMouseMotion( SDL_Event* evt ) {
 
-	// if ( click ) {
-	// 	for ( unsigned i = 0; i < ships.size(); i++ ) {
-	// 		ships.at(i)->head_to(evt->button.x, evt->button.y);
-	// 	}
-	// }
-
 	E->cursor._set(evt->button.x, evt->button.y);
 
 }
@@ -148,14 +160,30 @@ void Game::onMouseMotion( SDL_Event* evt ) {
 void Game::onMouseDown( SDL_Event* evt ) {
 	click = true;
 
-	for (unsigned j = 0; j < planets.size(); j++) {
-		if (
-			// If collision cursor/planet
-			pow( planets.at(j)->pos.x - evt->button.x, 2 ) + pow( planets.at(j)->pos.y - evt->button.y, 2 )
-				< pow( planets.at(j)->size, 2 )
-		) {
-			for ( unsigned i = 0; i < ships.size(); i++ ) {
-				ships.at(i)->head_to(*planets.at(j));
+	clearPlanetsFocus( evt );
+
+	if ( evt->button.button == SDL_BUTTON_RIGHT ) {
+		for (unsigned j = 0; j < planets.size(); j++) {
+			if (
+				// If collision cursor/planet
+				pow( planets.at(j)->pos.x - evt->button.x, 2 ) + pow( planets.at(j)->pos.y - evt->button.y, 2 )
+					< pow( planets.at(j)->size, 2 )
+			) {
+				planets.at(j)->focus = true;
+				break;
+			}
+		}
+	} else {
+		for (unsigned j = 0; j < planets.size(); j++) {
+			if (
+				// If collision cursor/planet
+				pow( planets.at(j)->pos.x - evt->button.x, 2 ) + pow( planets.at(j)->pos.y - evt->button.y, 2 )
+					< pow( planets.at(j)->size, 2 )
+			) {
+				for ( unsigned i = 0; i < ships.size(); i++ ) {
+					ships.at(i)->head_to(*planets.at(j));
+				}
+				break;
 			}
 		}
 	}
@@ -170,8 +198,13 @@ void Game::onKeyUp( SDL_Event* evt ) {
 	keys[ evt->key.keysym.sym ] = 0;
 }
 
-
-
 void Game::onMouseUp( SDL_Event* evt ) {
 	click = false;
+}
+
+void Game::clearPlanetsFocus( SDL_Event* evt )
+{
+	for (unsigned j = 0; j < planets.size(); j++) {
+		planets.at(j)->focus = false;
+	}
 }

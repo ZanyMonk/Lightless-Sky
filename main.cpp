@@ -20,11 +20,13 @@ int main(int argc, char** argv){
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {
 		return 1;
 	}
-	if (SDL_CreateWindowAndRenderer(500, 500, flags, &E->window, &E->renderer)) {
+
+	E->update_display_mode();
+
+	if (SDL_CreateWindowAndRenderer(E->display.w, E->display.h, flags, &E->window, &E->renderer)) {
 		return 1;
 	}
 
-	E->update_display_mode();
 
 	Game* game = new Game(E);
 	game->start();

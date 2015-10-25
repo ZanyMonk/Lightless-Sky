@@ -1,4 +1,4 @@
-#include "Ship.h"
+#include "Ship.hpp"
 
 using namespace std;
 
@@ -6,7 +6,7 @@ const char SHIP_COLOR_R = 200;
 const char SHIP_COLOR_G = 130;
 const char SHIP_COLOR_B = 250;
 
-Ship::Ship(Engine* E, Planet planet)
+Ship::Ship( Engine* E, Planet planet )
 :E(E), planet(planet), target(Point()), pos(Point(0,0)), _is_traveling(false) {
 	seed = SDL_GetTicks();
 	srand(seed);
@@ -54,9 +54,12 @@ void Ship::draw()
 void Ship::update()
 {
 	if ( _is_traveling ) {
+		// Calcul distance
+		double dist = sqrt(pow(target.x - pos.x, 2) + pow(target.y - pos.y, 2));
+
 		// Recalcul du point d'arrivée
-		int step = SDL_GetTicks()-seed%1000;
-		float S = sin((step-seed%1000)/((20-seed%5)*(20-speed/1.5)))*2;
+		int step = SDL_GetTicks()-seed%10000;
+		float S = sin(step/((20-seed%5)*(20-speed/1.5)))*2;
 		float C = cos(step/(20*(20-speed/1.5)));
 		target.x = planet.pos.x + C * (planet.size*2+S*10);
 		target.y = planet.pos.y + (C/2 + S/10) * (15+seed%int(planet.size*2));
@@ -96,8 +99,8 @@ void Ship::head_to(Planet new_planet)
 // Le vaisseau gravite autour de sa planète
 void Ship::gravitate()
 {
-	int step = SDL_GetTicks()-seed%1000;
-	float S = sin((step-seed%1000)/((20-seed%5)*(20-speed/1.5)))*2;
+	int step = SDL_GetTicks()-seed%10000;
+	float S = sin(step/((20-seed%5)*(20-speed/1.5)))*2;
 	float C = cos(step/(20*(20-speed/1.5)));
 	pos.x = planet.pos.x + C * (planet.size*2+S*10);
 	pos.y = planet.pos.y + (C/2 + S/10) * (15+seed%int(planet.size*2));

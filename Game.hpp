@@ -1,13 +1,16 @@
+#ifndef GAME_H
+#define GAME_H
+
 #include <vector>
 #include <iostream>
 #include <math.h>
 #include <SDL2/SDL.h>
-#include "SDL2_gfxPrimitives.h"
 #include <map>
-#include "Utils.h"
-#include "Engine.h"
-#include "Planet.h"
-#include "Ship.h"
+#include "Utils.hpp"
+#include "Engine.hpp"
+#include "Interface.hpp"
+#include "Planet.hpp"
+#include "Ship.hpp"
 
 using namespace std;
 
@@ -30,6 +33,7 @@ public:
 	void clearPlanetsFocus( SDL_Event* evt );
 private:
 	Engine* E;
+	Interface* I;
 	std::map<int,int> keys;
 	int target_x;
 	int target_y;
@@ -39,3 +43,5 @@ private:
 	vector<Ship*> ships;
 	vector<Planet*> planets;
 };
+
+#endif

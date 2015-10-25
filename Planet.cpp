@@ -1,16 +1,22 @@
-#include "Planet.h"
+#include "Planet.hpp"
 
-const int HOVER_GLOW_ALPHA = 15;
-const int BUTTONS_SIZE = 30;
-const int BUTTONS_RADIUS = 2;
-const int BUTTONS_PADDING = 5;
+/*----
+ * Planet.cpp
+ * Représente une planète.
+ * Attributs :
+ *  Engine E    Moteur de jeu
+ *  Point pos   Position
+ *  int size    Rayon
+ *  bool hover  Est sous le curseur
+ *  bool focus  Est sélectionnée
+ */
 
-Planet::Planet(Engine* E, Point position, float size)
-:E(E), pos(position), size(size), hover(0), focus(0) {
+Planet::Planet( Engine* E, Point position, float size, string name )
+:E(E), pos(position), size(size), hover(0), focus(0), name(name) {
 }
 
-Planet::Planet(Engine* E, int x, int y, float size)
-:E(E), pos(Point(x, y)), size(size), hover(0), focus(0) {
+Planet::Planet( Engine* E, int x, int y, float size, string name )
+:E(E), pos(Point(x, y)), size(size), hover(0), focus(0), name(name) {
 }
 
 Planet::~Planet() {
@@ -34,12 +40,8 @@ void Planet::draw()
     hover = 0;
   }
 
-  if ( hover ) {
+  if ( hover || focus ) {
     draw_glow();
-  }
-
-  if ( focus ) {
-    draw_options();
   }
 
   filledCircleRGBA(
@@ -65,24 +67,7 @@ void Planet::draw_glow()
     filledCircleRGBA(
       E->renderer,
       pos.x, pos.y, size+(4*i),
-      255, 255, 255, hover
+      255, 255, 255, ( focus ? 7 : hover/4 )
     );
 	}
-}
-
-//----
-// Draws option buttons on the side of the planet.
-void Planet::draw_options()
-{
-  int y = pos.y - ((BUTTONS_SIZE + BUTTONS_PADDING)*3) / 2;
-  int x = pos.x + size + BUTTONS_PADDING*3;
-  for ( int i = 0; i < 3; i++ ) {
-    roundedRectangleRGBA(
-      E->renderer,
-      x, y + (BUTTONS_SIZE + BUTTONS_PADDING)*i,
-      x + BUTTONS_SIZE, y + (BUTTONS_SIZE + BUTTONS_PADDING)*i + BUTTONS_SIZE,
-      BUTTONS_RADIUS,
-      255, 255, 255, ( focus ? HOVER_GLOW_ALPHA*10 : 0 )
-    );
-  }
 }

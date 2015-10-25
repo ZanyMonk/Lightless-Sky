@@ -4,19 +4,18 @@
 #include <map>
 #include <stdlib.h>
 #include "SDL2_gfxPrimitives.h"
-#include "SDL2_gfxPrimitives_font.h"
-#include "Utils.h"
-#include "Engine.h"
-#include "Planet.h"
-#include "Ship.h"
-#include "Game.h"
+#include "Utils.hpp"
+#include "Engine.hpp"
+#include "Planet.hpp"
+#include "Ship.hpp"
+#include "Game.hpp"
 
 using namespace std;
 
 int main(int argc, char** argv){
 	Engine* E = new Engine;
 
-	int flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
+	int flags = SDL_WINDOW_BORDERLESS;
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {
 		return 1;
 	}

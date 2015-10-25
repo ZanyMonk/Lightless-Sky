@@ -4,6 +4,10 @@
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
+#include <SDL2/SDL.h>
+#include "SDL2_gfxPrimitives.h"
+
+using namespace std;
 
 class Point {
 public:

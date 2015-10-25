@@ -9,9 +9,9 @@
 #include <time.h>
 #include <SDL2/SDL.h>
 #include "SDL2_gfxPrimitives.h"
-#include "Engine.h"
-#include "Utils.h"
-#include "Planet.h"
+#include "Engine.hpp"
+#include "Utils.hpp"
+#include "Planet.hpp"
 
 class Ship
 {

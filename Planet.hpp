@@ -6,25 +6,27 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 #include "SDL2_gfxPrimitives.h"
-#include "Engine.h"
-#include "Utils.h"
+#include "Engine.hpp"
+#include "Utils.hpp"
 
 using namespace std;
+
+const int HOVER_GLOW_ALPHA = 15;
 
 class Planet
 {
 public:
 
 	Planet( Engine* E );
-	Planet( Engine* E, int x, int y, float size );
-	Planet( Engine* E, Point position, float size );
+	Planet( Engine* E, int x, int y, float size, string name );
+	Planet( Engine* E, Point position, float size, string name );
 	~Planet();
 	void draw();
 	void draw_glow();
-	void draw_options();
 
 	Engine* E;
 	Point pos;
+	string name;
 	float size;
 	int hover;
 	int focus;

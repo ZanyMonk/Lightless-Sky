@@ -1,5 +1,4 @@
-#include "Game.h"
-// #include "SDL2_gfxPrimitives_font.h"
+#include "Game.hpp"
 
 #define ARRAY_SIZE(array) (sizeof((array))/sizeof((array[0])))
 
@@ -14,10 +13,11 @@ enum {
 
 Game::Game( Engine* E )
 :E(E), frameSkip(0), running(0), click(false) {
-	planets.push_back(new Planet(E, Point(500, 200), 20.0));
-	planets.push_back(new Planet(E, Point(1000, 400), 20.0));
-	planets.push_back(new Planet(E, Point(700, 750), 20.0));
-	planets.push_back(new Planet(E, 900, 400, 40.0));
+	I = new Interface(E);
+	planets.push_back(new Planet(E, Point(500, 200), 20.0, "Naboo"));
+	planets.push_back(new Planet(E, Point(1000, 400), 30.0, "Hoth"));
+	planets.push_back(new Planet(E, Point(700, 750), 25.0, "Coruscant"));
+	planets.push_back(new Planet(E, Point(200, 400), 50.0, "Endor"));
 
 	for ( int i = 0; i < NB_SHIPS; i++ ) {
 		ships.push_back(new Ship(E, *planets[0]));
@@ -27,9 +27,15 @@ Game::Game( Engine* E )
 Game::~Game() {
 	this->stop();
 
-	for ( int i = 0; i < NB_SHIPS; i++ ) {
-		delete ships[i];
-	}
+		for ( int i = 0; i < NB_SHIPS; i++ ) {
+			delete ships[i];
+		}
+
+		for ( unsigned i = 0; i < planets.size(); i++ ) {
+			delete planets.at(i);
+		}
+
+	delete I;
 }
 
 void Game::start() {
@@ -105,7 +111,7 @@ void Game::run() {
 
 void Game::update() {
 
-	if ( keys[SDLK_ESCAPE] || ( keys[SDLK_LALT] && keys[SDLK_F4] ) ) {
+	if ( keys[SDLK_ESCAPE] || ( keys[SDLK_F4] && keys[SDLK_LALT] ) ) {
 		stop();
 	}
 
@@ -118,7 +124,6 @@ void Game::update() {
 void Game::draw() {
 	// Clear screen
 	SDL_SetRenderDrawColor(E->renderer, BG_COLOR[0], BG_COLOR[1], BG_COLOR[2], 50);
-	// SDL_RenderClear(E->renderer);
 	boxRGBA(
 		E->renderer,
 		0, 0,
@@ -126,27 +131,22 @@ void Game::draw() {
 		BG_COLOR[0], BG_COLOR[1], BG_COLOR[2], 120
 	);
 
-	// char str[256];
-	//
-	// for ( int i = 30; i < 255; i++ ) {
-	// 	str[i-30] = i;
-	// }
-	//
-	// str[10] = 30;
-	// gfxPrimitivesSetFont(gfxPrimitivesFontdata, 7, 7);
-	// stringRGBA(E->renderer, 20, 20, "abcdefghijklmnopqrstuvwxyz", 255, 255, 255, 255);
-	// gfxPrimitivesSetFont(gfxPrimitivesFontdata, 8, 8);
-	// stringRGBA(E->renderer, 20, 40, str, 255, 255, 255, 255);
-
 	// Draw all planets
 	for ( unsigned i = 0; i < planets.size(); i++ ) {
 		planets.at(i)->draw();
+		if ( planets.at(i)->focus ) {
+			I->draw_planet_info(planets.at(i));
+			I->draw_planet_actions(planets.at(i));
+		}
 	}
 
 	// Draw all ships
 	for ( unsigned i = 0; i < ships.size(); i++ ) {
 		ships.at(i)->draw();
 	}
+
+	// Draw interface
+	I->draw();
 
 	SDL_RenderPresent(E->renderer);
 }

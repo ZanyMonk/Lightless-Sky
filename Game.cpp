@@ -14,10 +14,12 @@ enum {
 Game::Game( Engine* E )
 :E(E), frameSkip(0), running(0), click(false) {
 	I = new Interface(E);
-	planets.push_back(new Planet(E, Point(500, 200), 20.0, "Naboo"));
-	planets.push_back(new Planet(E, Point(1000, 400), 30.0, "Hoth"));
-	planets.push_back(new Planet(E, Point(700, 750), 25.0, "Coruscant"));
-	planets.push_back(new Planet(E, Point(200, 400), 50.0, "Endor"));
+	planets.push_back(new Planet(E, Point(500, 200), 20.0));
+	planets.push_back(new Planet(E, Point(1000, 400), 30.0));
+	planets.push_back(new Planet(E, Point(700, 750), 25.0));
+	planets.push_back(new Planet(E, Point(200, 400), 50.0));
+
+	planets.at(0)->focus = true;
 
 	for ( int i = 0; i < NB_SHIPS; i++ ) {
 		ships.push_back(new Ship(E, *planets[0]));

@@ -1,5 +1,7 @@
 #include "Planet.hpp"
 
+using namespace std;
+
 /*----
  * Planet.cpp
  * Représente une planète.
@@ -12,7 +14,11 @@
  */
 
 Planet::Planet( Engine* E, Point position, float size, string name )
-:E(E), pos(position), size(size), hover(0), focus(0), name(name) {
+:E(E), pos(position), size(size), hover(0), focus(0), name(name == "" ? generate_name() : name) {
+  seed = SDL_GetTicks();
+  srand(seed);
+  seed = rand();
+  SDL_Delay(1);
 }
 
 Planet::Planet( Engine* E, int x, int y, float size, string name )
@@ -70,4 +76,18 @@ void Planet::draw_glow()
       255, 255, 255, ( focus ? 7 : hover/4 )
     );
 	}
+}
+
+string Planet::generate_name()
+{
+  array<string,27> phonemes = {
+    "-", " ", "'", "ka", "ri", "ko", "ro", "ru", "cor", "syr", "sur", "tus", "tan", "too", "li",
+    "la", "do", "di", "va", "vi", "fer", "fus", "fez", "zul", "xin", "xy", "par"
+  };
+  string str;
+  for ( int i = 0; i < rand()%6+2; i++ ) {
+    str = str+phonemes[rand()%phonemes.size()];
+  }
+  str[0] = toupper(str[0]);
+  return str;
 }

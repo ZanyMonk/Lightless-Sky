@@ -54,7 +54,16 @@ void Interface::onMouseMotion( SDL_Event* evt )
 
 void Interface::onMouseDown( SDL_Event* evt )
 {
+  int a = E->amount;
+  int w = (8*(to_string(a).length()+2))+SLIDER_PADDING*4;
 
+  // Si on clique sur la slide bar
+  if (
+       evt->button.x > sb_x && evt->button.x < sb_x+sb_s
+    && evt->button.y > sb_y
+  ) {
+    E->amount = max(0, min((evt->button.x-sb_x-w/2)/(sb_s/100)+2, 100));
+  }
 }
 
 void Interface::onMouseUp( SDL_Event* evt )

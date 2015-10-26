@@ -44,7 +44,7 @@ enum {
 };
 
 Game::Game( Engine* E )
-:E(E), frameSkip(0), running(0), last_key(" "), focused_planet(0), throttle(false) {
+:E(E), frameSkip(0), running(0), focused_planet(0), throttle(false) {
 	I = new Interface(E);
 
 	planets.push_back(new Planet(E, Point(500, 200), 20.0));
@@ -206,7 +206,6 @@ void Game::update() {
 }
 
 void Game::draw() {
-	stringRGBA(E->renderer, 0, E->display.h-20, last_key, 255, 255, 255, 255);
 	// Clear screen
 	SDL_SetRenderDrawColor(E->renderer, BG_COLOR[0], BG_COLOR[1], BG_COLOR[2], 50);
 	boxRGBA(

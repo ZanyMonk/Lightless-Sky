@@ -9,10 +9,10 @@ test: SDL2_gfx/SDL2_gfxPrimitives.o SDL2_gfx/SDL2_rotozoom.o Engine.o Utils.o Sc
 	$(CC) -o $(EXEC) SDL2_gfx/SDL2_gfxPrimitives.o SDL2_gfx/SDL2_rotozoom.o Engine.o Utils.o Screen.o Game.o Interface.o Planet.o Ship.o main.o $(LDFLAGS)
 
 SDL2_gfx/SDL2_rotozoom.o: SDL2_gfx/SDL2_rotozoom.c
-	$(CC) -o $@ -c $< $(CFLAGS)
+	$(CC) -o $@ -c $<
 
 SDL2_gfx/SDL2_gfxPrimitives.o: SDL2_gfx/SDL2_gfxPrimitives.c SDL2_gfx/SDL2_rotozoom.h
-	$(CC) -o $@ -c $< $(CFLAGS)
+	$(CC) -o $@ -c $<
 
 Utils.o: Utils.cpp
 	$(CC) -o $@ -c $< $(CFLAGS)

@@ -39,7 +39,6 @@ private:
 	int target_y;
 	int frameSkip;
 	int running;
-	char* last_key;
 	int focused_planet;
 	bool throttle;
 	vector<Ship*> ships;

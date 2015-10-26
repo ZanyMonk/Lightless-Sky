@@ -3,7 +3,7 @@
 #include <iostream>
 #include <map>
 #include <stdlib.h>
-#include "SDL2_gfxPrimitives.h"
+#include "SDL2_gfx/SDL2_gfxPrimitives.h"
 #include "Utils.hpp"
 #include "Engine.hpp"
 #include "Planet.hpp"

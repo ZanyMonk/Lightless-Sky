@@ -8,7 +8,7 @@
 #include <math.h>
 #include <time.h>
 #include <SDL2/SDL.h>
-#include "SDL2_gfxPrimitives.h"
+#include "SDL2_gfx/SDL2_gfxPrimitives.h"
 #include "Engine.hpp"
 #include "Utils.hpp"
 #include "Planet.hpp"

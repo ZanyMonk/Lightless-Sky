@@ -1,3 +1,6 @@
+> /!\ Ce programme ne fonctionne pas /!\
+> /!\ This is no working program /!\
+
 Lightless Sky
 ===
 Un jeu de stratégie minimaliste dans un univers de science-fiction. Une introduction scénaristique viendra bientôt agrémenter cette page.

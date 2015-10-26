@@ -245,6 +245,7 @@ void Game::onMouseMotion( SDL_Event* evt ) {
 
 void Game::onMouseDown( SDL_Event* evt ) {
 	E->click = true;
+	I->onMouseDown( evt );
 
 	clearPlanetsFocus();
 
@@ -276,7 +277,7 @@ void Game::onKeyDown( SDL_Event* evt ) {
 	keys[ evt->key.keysym.sym ] = 1;
 
 	// Print des infos sur la touche pressée
-	printf("Physical %s key acting as %s key >>> %d\n",
+	printf("Physical %s key acting as %s key | Keycode: %d\n",
       SDL_GetScancodeName(evt->key.keysym.scancode),
       SDL_GetKeyName(evt->key.keysym.sym),
 			evt->key.keysym.sym);

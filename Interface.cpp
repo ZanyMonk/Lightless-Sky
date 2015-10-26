@@ -7,12 +7,13 @@ const int SLIDER_PADDING = 7;
 const int SLIDER_HEIGHT = 8+SLIDER_PADDING*2;
 const int SLIDER_BAR_WIDTH = 2;
 
-// Couleurs
-//      vert   bleu
-//          \  /
-//    0xAABBCCDD
-//      /  \
-// opacité rouge
+/* Couleurs
+ *      vert   bleu
+ *          \  /
+ *    0xAABBCCDD
+ *      /  \
+ * opacité  rouge
+ */
 const int GREEN = 0xFF3ECC1B;
 const int BLACK = 0xFF000000;
 const int RED = 0xFF0000FF;
@@ -43,9 +44,11 @@ void Interface::onMouseMotion( SDL_Event* evt )
   // Si on clique sur la slide bar
   if (
        sliding
-    || E->click
-    && evt->button.x > sb_x && evt->button.x < sb_x+sb_s
-    && evt->button.y > sb_y
+    || (
+         E->click
+      && evt->button.x > sb_x && evt->button.x < sb_x+sb_s
+      && evt->button.y > sb_y
+    )
   ) {
     sliding = true;
     E->amount = max(0, min((evt->button.x-sb_x-w/2)/(sb_s/100)+2, 100));
@@ -135,8 +138,8 @@ void Interface::draw_logo( int s )
 void Interface::draw_widget( int x, int y, int h, int w, int r )
 {
   // On place les différents points de notre widget
-  short int p_x[] = { x+r, x, x, x+w, x+w+r, x+w+r };
-  short int p_y[] = { y, y+r, y+h, y+h, y+h-r, y };
+  short int p_x[] = { short(x+r), short(x), short(x), short(x+w), short(x+w+r), short(x+w+r) };
+  short int p_y[] = { short(y), short(y+r), short(y+h), short(y+h), short(y+h-r), short(y) };
 
   // On dessine le fond
   filledPolygonColor(

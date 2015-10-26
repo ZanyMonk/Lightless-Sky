@@ -8,6 +8,11 @@ const int SLIDER_HEIGHT = 8+SLIDER_PADDING*2;
 const int SLIDER_BAR_WIDTH = 2;
 
 // Couleurs
+//      vert   bleu
+//          \  /
+//    0xAABBCCDD
+//      /  \
+// opacité rouge
 const int GREEN = 0xFF3ECC1B;
 const int BLACK = 0xFF000000;
 const int RED = 0xFF0000FF;

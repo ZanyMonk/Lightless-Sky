@@ -30,7 +30,7 @@ public:
 	void onMouseUp( SDL_Event* event );
 	void run();
 	void update();
-	void clearPlanetsFocus( SDL_Event* evt );
+	void clearPlanetsFocus();
 private:
 	Engine* E;
 	Interface* I;
@@ -38,8 +38,10 @@ private:
 	int target_x;
 	int target_y;
 	int frameSkip;
-	int running ;
-	bool click;
+	int running;
+	char* last_key;
+	int focused_planet;
+	bool throttle;
 	vector<Ship*> ships;
 	vector<Planet*> planets;
 };

@@ -81,12 +81,15 @@ void Planet::draw_glow()
 string Planet::generate_name()
 {
   array<string,27> phonemes = {
-    "-", " ", "'", "ka", "ri", "ko", "ro", "ru", "cor", "syr", "sur", "tus", "tan", "too", "li",
+    "-", "'", "ka", "ri", "ko", "ro", "ru", "cor", "syr", "sur", "tus", "tan", "too", "li",
     "la", "do", "di", "va", "vi", "fer", "fus", "fez", "zul", "xin", "xy", "par"
   };
   string str;
-  for ( int i = 0; i < rand()%6+2; i++ ) {
-    str = str+phonemes[rand()%phonemes.size()];
+  int len = rand()%4+2;
+  int m;
+  for ( int i = 0; i < len; i++ ) {
+    m = (i == 0 || i == len-1 ? 2 : 0);
+    str = str+phonemes[rand()%(phonemes.size()-m)+m];
   }
   str[0] = toupper(str[0]);
   return str;

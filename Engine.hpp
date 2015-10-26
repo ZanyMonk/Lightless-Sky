@@ -18,6 +18,8 @@ public:
 	SDL_Renderer* renderer;
 	SDL_DisplayMode display;
 	Point cursor;
+	int amount;
+	bool click;
 };
 
 #endif

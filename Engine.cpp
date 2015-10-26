@@ -5,6 +5,8 @@ using namespace std;
 Engine::Engine()
 {
 	cursor = Point(0,0);
+	amount = 100;
+	click = false;
 }
 
 Engine::~Engine()

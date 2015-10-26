@@ -3,18 +3,63 @@
 const int BUTTONS_SIZE = 30;
 const int BUTTONS_RADIUS = 2;
 const int BUTTONS_PADDING = 5;
+const int SLIDER_PADDING = 7;
+const int SLIDER_HEIGHT = 8+SLIDER_PADDING*2;
+const int SLIDER_BAR_WIDTH = 2;
+
+// Couleurs
+const int GREEN = 0xFF3ECC1B;
+const int BLACK = 0xFF000000;
+const int RED = 0xFF0000FF;
+const int GRAY = 0x2254778C;
+const int WHITE = 0xFFFFFFFF;
 
 Interface::Interface( Engine* E )
-:E(E){
+:E(E), sliding(false) {
+
+  gfxPrimitivesSetFont(gfxPrimitivesFontdata, 8, 8);
+
+  // Variables pour la slide bar
+    sb_s = E->display.w/2;
+    sb_x = E->display.w/2-sb_s/2;
+    sb_y = E->display.h-(SLIDER_HEIGHT+5);
+
 }
 
 Interface::~Interface()
 {
 }
 
-void Interface::draw()
+void Interface::onMouseMotion( SDL_Event* evt )
+{
+  int a = E->amount;
+  int w = (8*(to_string(a).length()+2))+SLIDER_PADDING*4;
+
+  // Si on clique sur la slide bar
+  if (
+       sliding
+    || E->click
+    && evt->button.x > sb_x && evt->button.x < sb_x+sb_s
+    && evt->button.y > sb_y
+  ) {
+    sliding = true;
+    E->amount = max(0, min((evt->button.x-sb_x-w/2)/(sb_s/100)+2, 100));
+  }
+}
+
+void Interface::onMouseDown( SDL_Event* evt )
 {
 
+}
+
+void Interface::onMouseUp( SDL_Event* evt )
+{
+  sliding = false;
+}
+
+void Interface::draw()
+{
+  draw_slider();
 }
 
 //----
@@ -26,8 +71,6 @@ void Interface::draw_logo( int s )
   s = s/3;
   int x = E->display.w/2-(s*3)/2;
   int y = E->display.h/2-(s*3)/2;
-  int black = 0xFF000100;
-  int red = 0xFF0000FF;
 
   // Top trigon
   filledTrigonColor(
@@ -35,7 +78,7 @@ void Interface::draw_logo( int s )
     x+s, y,
     x+s*2, y,
     x+s*2, y+s,
-    black
+    BLACK
   );
 
   // Right trigon
@@ -44,7 +87,7 @@ void Interface::draw_logo( int s )
     x+s*3, y+s,
     x+s*3, y+s*2,
     x+s*2, y+s*2,
-    red
+    RED
   );
 
   // Bottom trigon
@@ -53,7 +96,7 @@ void Interface::draw_logo( int s )
     x+s, y+s*2,
     x+s, y+s*3,
     x+s*2, y+s*3,
-    black
+    BLACK
   );
 
   // Left trigon
@@ -62,7 +105,7 @@ void Interface::draw_logo( int s )
     x, y+s,
     x, y+s*2,
     x+s, y+s,
-    red
+    RED
   );
 
 }
@@ -82,30 +125,63 @@ void Interface::draw_widget( int x, int y, int h, int w, int r )
   short int p_y[] = { y, y+r, y+h, y+h, y+h-r, y };
 
   // On dessine le fond
-  filledPolygonRGBA(
+  filledPolygonColor(
     E->renderer,
     p_x, p_y,
     6,
-    255, 255, 255, 40
+    GRAY
   );
 
   // Puis le contour
   E->draw_polygon(p_x, p_y, 6, 112, 189, 40, 255);
 
-  aalineRGBA(
+  aalineColor(
     E->renderer,
     x+r*2, y,
     x, y+r*2,
-    112, 189, 40, 255
+    GREEN
   );
 
-  aalineRGBA(
+  aalineColor(
     E->renderer,
     x+w-r, y+h,
     x+w+r, y+h-r*2,
-    112, 189, 40, 255
+    GREEN
   );
 
+}
+
+//----
+// Dessine le widget permettant la sélection du pourcentage de troupes à déplacer
+void Interface::draw_slider()
+{
+  int a = E->amount;
+  int w = (8*(to_string(a).length()+2))+SLIDER_PADDING*4;
+  char buff[10];
+  sprintf(buff, "%d %%", a);
+
+  rectangleColor(
+    E->renderer,
+    sb_x, sb_y+(SLIDER_HEIGHT/2-SLIDER_BAR_WIDTH/2),
+    sb_x+sb_s, sb_y+(SLIDER_HEIGHT/2+SLIDER_BAR_WIDTH/2),
+    GREEN
+  );
+
+  boxColor(
+    E->renderer,
+    (sb_s/100)*a+sb_x-w/2, sb_y,
+    (sb_s/100)*a+sb_x+w/2, sb_y+SLIDER_HEIGHT,
+    BLACK
+  );
+
+  rectangleColor(
+    E->renderer,
+    (sb_s/100)*a+sb_x-w/2, sb_y,
+    (sb_s/100)*a+sb_x+w/2, sb_y+SLIDER_HEIGHT,
+    GREEN
+  );
+
+  stringColor(E->renderer, (sb_s/100)*a-w/2+sb_x+SLIDER_PADDING*2, sb_y+SLIDER_PADDING, buff, GREEN);
 }
 
 //----
@@ -121,11 +197,10 @@ void Interface::draw_planet_info( Planet* p )
 
   char buff[200];
 
-	gfxPrimitivesSetFont(gfxPrimitivesFontdata, 8, 8);
   sprintf(buff, "Nom:    %s", p->name.c_str());
-	stringRGBA(E->renderer, 20, 20, buff, 255, 255, 255, 255);
+	stringColor(E->renderer, 20, 20, buff, WHITE);
   sprintf(buff, "Taille: %d", int(p->size));
-	stringRGBA(E->renderer, 20, 30, buff, 255, 255, 255, 255);
+	stringColor(E->renderer, 20, 30, buff, WHITE);
 }
 
 

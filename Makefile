@@ -3,7 +3,7 @@ CFLAGS=-Wall -g -std=c++11
 LDFLAGS=-lSDL2
 EXEC=test
 
-all: $(EXEC)
+all: $(EXEC) clean
 
 test: SDL2_gfx/SDL2_gfxPrimitives.o SDL2_gfx/SDL2_rotozoom.o Engine.o Utils.o Screen.o Interface.o Game.o Planet.o Ship.o main.o
 	$(CC) -o $(EXEC) SDL2_gfx/SDL2_gfxPrimitives.o SDL2_gfx/SDL2_rotozoom.o Engine.o Utils.o Screen.o Game.o Interface.o Planet.o Ship.o main.o $(LDFLAGS)
@@ -39,7 +39,8 @@ main.o: main.cpp Engine.hpp Utils.hpp Screen.hpp Game.hpp Interface.hpp Planet.h
 	$(CC) -o main.o -c main.cpp $(CFLAGS)
 
 clean:
-	rm -rf *.o
+	@rm -rf *.o
+	@echo -e "[+] Object files removed.\n\n"
 
 mrproper: clean
 	rm -rf $(EXEC)

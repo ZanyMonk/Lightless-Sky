@@ -54,9 +54,6 @@ void Ship::draw()
 void Ship::update()
 {
 	if ( _is_traveling ) {
-		// Calcul distance
-		double dist = sqrt(pow(target.x - pos.x, 2) + pow(target.y - pos.y, 2));
-
 		// Recalcul du point d'arrivée
 		int step = SDL_GetTicks()-seed%10000;
 		float S = sin(step/((20-seed%5)*(20-speed/1.5)))*2;

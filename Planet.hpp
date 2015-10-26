@@ -29,11 +29,11 @@ public:
 
 	Engine* E;
 	Point pos;
-	string name;
 	int seed;
 	float size;
 	int hover;
 	int focus;
+	string name;
 private:
 };
 

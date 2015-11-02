@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <array>
+#include <vector>
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
@@ -10,30 +11,39 @@
 #include "SDL2_gfx/SDL2_gfxPrimitives.h"
 #include "Utils.hpp"
 #include "Engine.hpp"
+#include "Entity.hpp"
+#include "Ship.hpp"
 
 using namespace std;
 
 const int HOVER_GLOW_ALPHA = 15;
+const int LINK_GLOW_WIDTH = 15;
 
-class Planet
+class Planet : public Entity
 {
 public:
-
-	Planet( Engine* E );
-	Planet( Engine* E, Point position, float size, string name = "" );
-	Planet( Engine* E, int x, int y, float size, string name = "" );
+	Planet( Engine* E, Point pos, float size, const string &name = "" );
 	~Planet();
+	void onMouseDown( SDL_Event* evt );
+	void onMouseUp( SDL_Event* evt );
+	void update();
 	void draw();
+	void draw_planet();
+	void draw_link();
 	void draw_glow();
-	string generate_name();
+	void draw_shadow();
+	int send( int n, Planet* target );
+	int host( Ship* ship );
+	int msg( int type );
+	string generate_name( Uint8 min, Uint8 max );
 
-	Engine* E;
-	Point pos;
 	int seed;
-	float size;
 	int hover;
 	int focus;
-	string name;
+	int select;
+	SDL_Texture* text_name;
+	vector<Planet*> planets;
+	vector<Ship*> ships;
 private:
 };
 

@@ -11,4 +11,5 @@ Compilation
 ---
 ### Linux
 Cette commande devrait faire l'affaire pour compiler le bouzin. Vous aurez besoin de la SDL2, version développeur.
-`g++ -Wall -g -std=c++11 main.cpp SDL2_gfxPrimitives.c SDL2_rotozoom.c Engine.cpp Game.cpp Screen.cpp Interface.cpp Planet.cpp Ship.cpp Utils.cpp -Wall -w -lSDL2 -o test && ./test`
+`make
+./test`

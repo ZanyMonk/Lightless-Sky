@@ -26,7 +26,6 @@ int main(int argc, char** argv){
 		return 1;
 	}
 
-
 	Game* game = new Game(E);
 	game->start();
 	delete game;

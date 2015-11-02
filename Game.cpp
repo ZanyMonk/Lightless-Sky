@@ -35,42 +35,49 @@ const SDL_Keycode K_RIGHT = 1073741903;
 const SDL_Keycode K_LEFT = 1073741904;
 const SDL_Keycode K_DOWN = 1073741905;
 const SDL_Keycode K_UP = 1073741906;
-
-using namespace std;
+const SDL_Keycode K_CTRL = 1073742048;
 
 enum {
 	UPDATE_INTERVAL = 1000/60
-	, NB_SHIPS = 10
+	, NB_SHIPS = 100
 };
 
 Game::Game( Engine* E )
-:E(E), frameSkip(0), running(0), focused_planet(0), throttle(false) {
-	I = new Interface(E);
+:E(E), frameSkip(0), running(0), focused_planet(0), selected_planet(-1), throttle(false) {
 
-	planets.push_back(new Planet(E, Point(500, 200), 20.0));
-	planets.push_back(new Planet(E, Point(1000, 400), 30.0));
-	planets.push_back(new Planet(E, Point(700, 750), 25.0));
-	planets.push_back(new Planet(E, Point(200, 400), 50.0));
+	SDL_SetRenderDrawBlendMode(E->renderer,SDL_BLENDMODE_NONE);
+
+	I = new Interface(E);
+	screen = new Screen(E);
+
+	planets.push_back(new Planet(E, Point(500, 200), 22.143));
+	planets.push_back(new Planet(E, Point(1000, 400), 35.666));
+	planets.push_back(new Planet(E, Point(700, 750), 42.314));
+	planets.push_back(new Planet(E, Point(200, 350), 57.1337));
+
+	for ( unsigned i = 0; i < planets.size(); i++ ) {
+		planets.at(i)->planets = planets;
+	}
 
 	// REMOVE ME
 	planets.at(0)->focus = true;
+	planets.at(0)->sister = planets[1];
+	planets.at(1)->sister = planets[3];
+	planets.at(2)->sister = planets[1];
 
 	for ( int i = 0; i < NB_SHIPS; i++ ) {
-		ships.push_back(new Ship(E, *planets[0]));
+		planets.at(3)->ships.push_back(new Ship(E, planets.at(3)));
 	}
+
 }
 
 Game::~Game() {
 	this->stop();
-
-		for ( int i = 0; i < NB_SHIPS; i++ ) {
-			delete ships[i];
-		}
-
 		for ( unsigned i = 0; i < planets.size(); i++ ) {
 			delete planets.at(i);
 		}
 
+	delete screen;
 	delete I;
 }
 
@@ -80,16 +87,20 @@ void Game::start() {
 }
 
 void Game::stop() {
+
 	if (NULL != E->renderer) {
 		SDL_DestroyRenderer(E->renderer);
 		E->renderer = NULL;
 	}
+
 	if (NULL != E->window) {
 		SDL_DestroyWindow(E->window);
 		E->window = NULL;
 	}
+
 	running = 0;
 	SDL_Quit();
+
 }
 
 //---
@@ -176,43 +187,50 @@ void Game::update() {
 	}
 
 	// Gestion des touches droite et gauche pour sélectionner une planète
-	if ( keys[K_RIGHT] == 1 || keys[K_LEFT] == 1 ) {
+	if ( keys[K_UP] == 1 || keys[K_RIGHT] == 1  || keys[K_DOWN] == 1  || keys[K_LEFT] == 1 ) {
 		clearPlanetsFocus();
+		if ( keys[K_UP] ) {
+			keys[K_UP] = 2;
+			focused_planet = findClosestPlanetIndex(planets.at(focused_planet), 0);
+		}
 		if ( keys[K_RIGHT] ) {
 			keys[K_RIGHT] = 2;
-			focused_planet--;
+			focused_planet = findClosestPlanetIndex(planets.at(focused_planet), 1);
+		}
+		if ( keys[K_DOWN] ) {
+			keys[K_DOWN] = 2;
+			focused_planet = findClosestPlanetIndex(planets.at(focused_planet), 2);
 		}
 		if ( keys[K_LEFT] ) {
 			keys[K_LEFT] = 2;
-			focused_planet++;
+			focused_planet = findClosestPlanetIndex(planets.at(focused_planet), 3);
 		}
-		planets.at(focused_planet%planets.size())->focus = true;
+		planets.at(focused_planet)->focus = true;
 	}
 
 	// Gestion des touches haut et bas pour régler le pourcentage de vaisseaux
-	if ( keys[K_UP] == 1 ) {
+	if ( keys[K_CTRL] && keys[K_UP] == 1 ) {
 		keys[K_UP] = 2;
 		E->amount = min(100, E->amount+10);
-	} else if ( keys[K_DOWN] == 1 ) {
+	} else if ( keys[K_CTRL] && keys[K_DOWN] == 1 ) {
 		keys[K_DOWN] = 2;
 		E->amount = max(0, E->amount-10);
 	}
 
 
-	for ( unsigned i = 0; i < ships.size(); i++ ) {
-		ships.at(i)->update();
+	for ( unsigned i = 0; i < planets.size(); i++ ) {
+		planets.at(i)->update();
 	}
 
 }
 
 void Game::draw() {
 	// Clear screen
-	SDL_SetRenderDrawColor(E->renderer, BG_COLOR[0], BG_COLOR[1], BG_COLOR[2], 50);
 	boxRGBA(
 		E->renderer,
 		0, 0,
 		E->display.w, E->display.h,
-		BG_COLOR[0], BG_COLOR[1], BG_COLOR[2], 120
+		BG_COLOR[0], BG_COLOR[1], BG_COLOR[2], 200
 	);
 
 	// Draw all planets
@@ -222,11 +240,6 @@ void Game::draw() {
 			I->draw_planet_info(planets.at(i));
 			I->draw_planet_actions(planets.at(i));
 		}
-	}
-
-	// Draw all ships
-	for ( unsigned i = 0; i < ships.size(); i++ ) {
-		ships.at(i)->draw();
 	}
 
 	// Draw interface
@@ -246,30 +259,20 @@ void Game::onMouseDown( SDL_Event* evt ) {
 	E->click = true;
 	I->onMouseDown( evt );
 
-	clearPlanetsFocus();
-
 	for (unsigned j = 0; j < planets.size(); j++) {
-		if (
-			// If collision cursor/planet
-			pow( planets.at(j)->pos.x - evt->button.x, 2 ) + pow( planets.at(j)->pos.y - evt->button.y, 2 )
-				< pow( planets.at(j)->size, 2 )
-		) {
-			if ( evt->button.button == SDL_BUTTON_RIGHT ) {
-				planets.at(j)->focus = true;
-			} else {
-				for ( unsigned i = 0; i < ships.size(); i++ ) {
-					ships.at(i)->head_to(*planets.at(j));
-				}
-			}
-			break;
-		}
+		planets.at(j)->onMouseDown( evt );
 	}
 
 }
 
 void Game::onMouseUp( SDL_Event* evt ) {
 	E->click = false;
+	selected_planet = -1;
 	I->onMouseUp( evt );
+
+	for (unsigned j = 0; j < planets.size(); j++) {
+		planets.at(j)->onMouseUp( evt );
+	}
 }
 
 void Game::onKeyDown( SDL_Event* evt ) {
@@ -291,4 +294,32 @@ void Game::clearPlanetsFocus()
 	for (unsigned j = 0; j < planets.size(); j++) {
 		planets.at(j)->focus = false;
 	}
+}
+
+int Game::findClosestPlanetIndex( Planet* planet, int side )
+{
+	float dist, min;
+	int index = 0;
+	min = 0;
+	for ( unsigned i = 0; i < planets.size(); i++ ) {
+		if ( planet->pos.x != planets.at(i)->pos.x && planet->pos.y != planets.at(i)->pos.y ) {
+			dist = sqrt(pow(planet->pos.y-planets.at(i)->pos.y, 2)+pow(planet->pos.x-planets.at(i)->pos.x, 2));
+			if ( min == 0 ) {
+				min = dist;
+			} else {
+				if ( min > dist ) {
+					if (
+								( side == 0 && planets.at(i)->pos.y < planet->pos.y )
+						||	( side == 1 && planets.at(i)->pos.x > planet->pos.x )
+						||	( side == 2 && planets.at(i)->pos.y > planet->pos.y )
+						||	( side == 3 && planets.at(i)->pos.x < planet->pos.x )
+					) {
+						min = dist;
+						index = i;
+					}
+				}
+			}
+		}
+	}
+	return index;
 }

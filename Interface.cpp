@@ -7,28 +7,30 @@ const int SLIDER_PADDING = 7;
 const int SLIDER_HEIGHT = 8+SLIDER_PADDING*2;
 const int SLIDER_BAR_WIDTH = 2;
 
-/* Couleurs
- *      vert   bleu
- *          \  /
- *    0xAABBCCDD
- *      /  \
- * opacité  rouge
- */
-const int GREEN = 0xFF3ECC1B;
-const int BLACK = 0xFF000000;
-const int RED = 0xFF0000FF;
-const int GRAY = 0x2254778C;
-const int WHITE = 0xFFFFFFFF;
-
 Interface::Interface( Engine* E )
 :E(E), sliding(false) {
 
   gfxPrimitivesSetFont(gfxPrimitivesFontdata, 8, 8);
 
   // Variables pour la slide bar
-    sb_s = E->display.w/2;
-    sb_x = E->display.w/2-sb_s/2;
-    sb_y = E->display.h-(SLIDER_HEIGHT+5);
+  sb_s = E->display.w/2;
+  sb_x = E->display.w/2-sb_s/2;
+  sb_y = E->display.h-(SLIDER_HEIGHT+5);
+
+  widgets.push_back(new Widget(
+    E,
+    "planet_info",
+    Point(10, 10),
+    205, 100, 5
+  ));
+
+  widgets.push_back(new Widget(
+    E,
+    widgets.at(0),
+    "planet_info_sister",
+    Point(10, 120),
+    80, 50, 5
+  ));
 
 }
 
@@ -83,11 +85,11 @@ void Interface::draw()
 // Dessine l'insigne de l'Union
 // Arguments :
 //  int s   Taille de l'insigne en pixels
-void Interface::draw_logo( int s )
+void Interface::draw_logo( Point pos, int s )
 {
   s = s/3;
-  int x = E->display.w/2-(s*3)/2;
-  int y = E->display.h/2-(s*3)/2;
+  int x = pos.x-(s*3)/2;
+  int y = pos.y-(s*3)/2;
 
   // Top trigon
   filledTrigonColor(
@@ -123,47 +125,6 @@ void Interface::draw_logo( int s )
     x, y+s*2,
     x+s, y+s,
     RED
-  );
-
-}
-
-//----
-// Dessine une fenêtre stylisée.
-// Arguments :
-//  int x   origin point x
-//  int y   origin point y
-//  int r   radius
-//  int h   height
-//  int w   width
-void Interface::draw_widget( int x, int y, int h, int w, int r )
-{
-  // On place les différents points de notre widget
-  short int p_x[] = { short(x+r), short(x), short(x), short(x+w), short(x+w+r), short(x+w+r) };
-  short int p_y[] = { short(y), short(y+r), short(y+h), short(y+h), short(y+h-r), short(y) };
-
-  // On dessine le fond
-  filledPolygonColor(
-    E->renderer,
-    p_x, p_y,
-    6,
-    GRAY
-  );
-
-  // Puis le contour
-  E->draw_polygon(p_x, p_y, 6, 112, 189, 40, 255);
-
-  aalineColor(
-    E->renderer,
-    x+r*2, y,
-    x, y+r*2,
-    GREEN
-  );
-
-  aalineColor(
-    E->renderer,
-    x+w-r, y+h,
-    x+w+r, y+h-r*2,
-    GREEN
   );
 
 }
@@ -207,17 +168,19 @@ void Interface::draw_slider()
 //  Planet p  planète sélectionnée
 void Interface::draw_planet_info( Planet* p )
 {
-  draw_widget(
-    10, 10,
-    100, 200
-  );
+
+  widgets.at(0)->draw();
 
   char buff[200];
 
-  sprintf(buff, "Nom:    %s", p->name.c_str());
+  sprintf(buff, "Nom:%s%s", E->multString(" ", 20-p->name.length()).c_str(), p->name.c_str());
 	stringColor(E->renderer, 20, 20, buff, WHITE);
-  sprintf(buff, "Taille: %d", int(p->size));
-	stringColor(E->renderer, 20, 30, buff, WHITE);
+  sprintf(buff, "Rayon:%s%d km", E->multString(" ", 15-to_string(int(p->size*500)).length()).c_str(), int(p->size*500));
+	stringColor(E->renderer, 20, 32, buff, WHITE);
+
+  if ( p->sister != NULL ) {
+    widgets.at(1)->draw();
+  }
 }
 
 

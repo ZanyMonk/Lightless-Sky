@@ -43,17 +43,18 @@ enum {
 };
 
 Game::Game( Engine* E )
-:E(E), frameSkip(0), running(0), focused_planet(0), selected_planet(-1), throttle(false) {
-
-	SDL_SetRenderDrawBlendMode(E->renderer,SDL_BLENDMODE_NONE);
+:E(E), frameSkip(0), running(0), focused_planet(-1), selected_planet(-1), throttle(false) {
 
 	I = new Interface(E);
 	screen = new Screen(E);
 
-	planets.push_back(new Planet(E, Point(500, 200), 22.143));
-	planets.push_back(new Planet(E, Point(1000, 400), 35.666));
-	planets.push_back(new Planet(E, Point(700, 750), 42.314));
+	planets.push_back(new Planet(E, Point(500, 150), 22.143));
+	planets.push_back(new Planet(E, Point(1100, 400), 35.666));
+	planets.push_back(new Planet(E, Point(720, 750), 42.314));
 	planets.push_back(new Planet(E, Point(200, 350), 57.1337));
+
+	// Soleil
+	planets.push_back(new Star(E, Point(620, 420), 74.1337));
 
 	for ( unsigned i = 0; i < planets.size(); i++ ) {
 		planets.at(i)->planets = planets;
@@ -61,12 +62,13 @@ Game::Game( Engine* E )
 
 	// REMOVE ME
 	planets.at(0)->focus = true;
-	planets.at(0)->sister = planets[1];
-	planets.at(1)->sister = planets[3];
-	planets.at(2)->sister = planets[1];
+	planets.at(1)->sister = planets[2];
 
-	for ( int i = 0; i < NB_SHIPS; i++ ) {
+	for ( int i = 0; i < NB_SHIPS/2; i++ ) {
 		planets.at(3)->ships.push_back(new Ship(E, planets.at(3)));
+	}
+	for ( int i = 0; i < NB_SHIPS/2; i++ ) {
+		planets.at(1)->ships.push_back(new Ship(E, planets.at(1)));
 	}
 
 }

@@ -7,7 +7,7 @@ const char SHIP_COLOR_G = 130;
 const char SHIP_COLOR_B = 250;
 
 Ship::Ship( Engine* E, Entity* planet )
-	:Entity(E, planet->pos, 1.0),
+	:Entity(E, planet->pos, 1),
 	planet(planet),
 	target(planet->pos),
 	is_traveling(false)
@@ -38,20 +38,11 @@ void Ship::draw()
 		)
 	) {
 		// On peut carrément améliorer ça, soit avec un sprite, soit avec un peu de code ;)
-		double r = size*3.0;
-	  filledCircleRGBA(
-	    E->renderer,
-	    pos.x + r/2, pos.y + r/2, r,
-			255, 255, 255,
-	    fabs( sin(SDL_GetTicks()) / 2.5 ) * 90
-	  );
+		// E->draw_circle(size, &pos, 0xFFFFFFFF);
+		// E->draw_circle(size*2, &pos, 0x55FFFFFF);
+		circleRGBA(E->renderer, pos.x, pos.y, size, 0xFF, 0xFF, 0xFF, 0xFF);
+		circleRGBA(E->renderer, pos.x, pos.y, size*2, 0xFF, 0xFF, 0xFF, 0x55);
 
-		boxRGBA(
-			E->renderer,
-			pos.x, pos.y,
-			pos.x + size, pos.y + size,
-			255, 255, 255, 255
-		);
 	}
 
 }
@@ -63,12 +54,6 @@ void Ship::update()
 	if ( is_traveling ) {
 		go_to_target();
 	} else {
-		// Si on est sur une planète émétrice, on bouge vers la planète réceptrice
-		if ( planet->sister != NULL ) {
-			// planet->msg(0);
-			head_to(planet->sister);
-			return;
-		}
 		gravitate();
 	}
 }

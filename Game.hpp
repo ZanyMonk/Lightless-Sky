@@ -10,7 +10,9 @@
 #include "Engine.hpp"
 #include "Interface.hpp"
 #include "Screen.hpp"
+#include "Entity.hpp"
 #include "Planet.hpp"
+#include "Star.hpp"
 #include "Ship.hpp"
 
 using namespace std;

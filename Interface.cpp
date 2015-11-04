@@ -10,8 +10,6 @@ const int SLIDER_BAR_WIDTH = 2;
 Interface::Interface( Engine* E )
 :E(E), sliding(false) {
 
-  gfxPrimitivesSetFont(gfxPrimitivesFontdata, 8, 8);
-
   // Variables pour la slide bar
   sb_s = E->display.w/2;
   sb_x = E->display.w/2-sb_s/2;

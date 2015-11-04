@@ -5,6 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <iostream>
 #include "Utils.hpp"
+#include "Faction.hpp"
 
 /* Couleurs
  *      vert   bleu
@@ -19,6 +20,16 @@ const int RED		= 0xFF0000FF;
 const int GRAY	= 0x2254778C;
 const int WHITE	= 0xFFFFFFFF;
 
+const string TERM_COLORS[] = {
+	"0;30",
+	"0;31",
+	"0;32",
+	"0;33",
+	"0;34",
+	"0;37",
+};
+const string END_COLOR = "\033[m";
+
 const string FONT_PATH			= "fonts/Welbut__.ttf";
 const int FONT_SIZE_DEFAULT	= 12;
 
@@ -27,29 +38,39 @@ class Engine
 public:
 	Engine();
 	~Engine();
-	void update_display_mode();
-	// Drawing functions
+
+	// Textures
 	SDL_Texture* text_to_textureColor(
 		const string &message,
-		const string &fontFile,
 		Uint32 color,
+		const string &fontFile = FONT_PATH,
 		Uint8 fontSize = FONT_SIZE_DEFAULT
 	);
 	SDL_Texture* text_to_textureRGBA(
 		const string &message,
-		const string &fontFile,
 		Uint8 r, Uint8 g, Uint8 b, Uint8 a,
+		const string &fontFile = FONT_PATH,
 		Uint8 fontSize = FONT_SIZE_DEFAULT
 	);
+
+	//----
+	// Dessin
 	void draw_textColor( const string &text, Point* pos, Uint32 color );
 	void draw_textRGBA(
 		const std::string &text,
 		Point* pos,
 		Uint8 r, Uint8 g, Uint8 b, Uint8 a,
+		const string &fontFile = FONT_PATH,
 		Uint8 fontSize = FONT_SIZE_DEFAULT
 	);
 	void draw_texture( SDL_Texture* texture, Point* pos, Sint8 alpha = 255 );
 	void draw_polygon( short int x[], short int y[], Sint8 n, Uint32 color );
+
+	//----
+	// Divers
+	void log( const string &message, const string &color = "white" );
+	void log_error( const string &message );
+	void update_display_mode();
 	string multString( string str, Sint8 n );
 
 	SDL_Window* window;

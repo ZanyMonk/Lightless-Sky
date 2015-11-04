@@ -6,25 +6,33 @@ using namespace std;
  * Planet.cpp
  * Représente une planète.
  * Attributs :
- *  Engine E    Moteur de jeu
- *  Point pos   Position
- *  int size    Rayon
- *  bool hover  Est sous le curseur
- *  bool focus  Est sélectionnée
+ *  Engine E          Moteur de jeu
+ *  Point pos         Position
+ *  int size          Rayon
+ *  int faction       Faction
+ *    -1    Interdit
+ *    0     Neutre
+ *    1     Faction 1
+ *    2     Faction 2 etc ...
+ *  Planet* sister    Planète sœur, vers laquelle envoyer automatiquement les vaisseaux
+ *  bool hover        Est sous le curseur
+ *  bool focus        A la focalisation
+ *  bool select       Est sélectionnée
+ *  SDL_Texture* text_relief  Texture de la planète
+ *  SDL_Texture* text_name    Texture du nom de la planète
  */
 
-Planet::Planet( Engine* E, Point pos, float size, const string &name )
-  :Entity(E, pos, size, (name == "" ? generate_name(2, 4) : name), NULL),
+Planet::Planet( Engine* E, Point pos, float size, int faction, const string &name, Planet* sister )
+  :Entity(E, pos, size, (name == "" ? generate_name(2, 4) : name)),
+  sister(sister),
+  faction(faction),
   hover(0),
   focus(0),
   select(0),
+  text_relief(nullptr),
   text_name(nullptr)
 {
 
-  seed = SDL_GetTicks();
-  srand(seed);
-  seed = rand();
-  SDL_Delay(1);
 }
 
 Planet::~Planet()
@@ -36,7 +44,15 @@ Planet::~Planet()
 
 void Planet::update()
 {
-  // TODO : Génération de texture aléatoire
+  // On génère la texture de la planète si ça n'a pas déjà été fait
+  if ( text_relief == nullptr ) {
+    text_relief = generate_text_relief();
+  }
+
+  // Si on n'a pas encore généré la texture du nom de la planète, on le fait
+  if ( text_name == nullptr ) {
+    text_name = E->text_to_textureRGBA(name, 255, 255, 255, 255);
+  }
 
   // On fait une transition entre les valeurs 0 et HOVER_GLOW_ALPHA d'opacité du nom de la planète
   // et de son effet de survol.
@@ -56,9 +72,17 @@ void Planet::update()
     }
   }
 
-  // Si on n'a pas encore généré la texture du nom de la planète, on le fait
-  if ( text_name == nullptr ) {
-    text_name = E->text_to_textureRGBA(name, FONT_PATH, 255, 255, 255, 255, 12);
+  unsigned len, n;
+  len = ships.size();
+
+  if ( sister != NULL && len > 0 ) {
+    for ( unsigned i = 0; i < len; i++ ) {
+      if ( !ships.at(i)->is_traveling )
+        n++;
+    }
+    if ( n > 0 ) {
+      send(n, sister);
+    }
   }
 }
 
@@ -67,7 +91,7 @@ void Planet::update()
 void Planet::draw()
 {
 
-  // draw_link();
+  draw_link();
 
   if ( hover || focus ) {
     draw_glow();
@@ -83,6 +107,9 @@ void Planet::draw()
       (focus ? HOVER_GLOW_ALPHA*10 : hover*10)
     );
   }
+
+  // On dessine l'ombre de la planète
+  draw_shadow();
 
   if ( select ) {
     // On dessine un lien entre la planète sélectionnée et le curseur
@@ -100,8 +127,7 @@ void Planet::draw()
     ships.at(i)->draw();
   }
 
-  // On dessine l'ombre de la planète
-  // draw_shadow();
+  // E->draw_texture(text_relief, &pos);
 
 }
 
@@ -163,24 +189,37 @@ void Planet::onMouseUp( SDL_Event* evt )
 
 }
 
+SDL_Texture* Planet::generate_text_relief()
+{
+
+  int width = size*2;
+
+  SDL_Texture* texture = SDL_CreateTexture(E->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width*3.14, width);
+
+  // TODO : Génération de la texture de la planète
+  SDL_Rect rect;
+  rect.x = pos.x;
+  rect.y = pos.y;
+  rect.w = rect.h = width;
+  SDL_SetRenderTarget(E->renderer, texture);
+  SDL_SetRenderDrawColor(
+    E->renderer,
+    0xFF, 0xFF, 0xFF, 0xFF
+  );
+  SDL_RenderClear(E->renderer);
+  SDL_RenderDrawRect(E->renderer, &rect);
+
+  SDL_SetRenderTarget(E->renderer, NULL);
+
+  return texture;
+
+}
+
 void Planet::draw_planet()
 {
 
-    int x, y, width;
-    float pos_x, pos_y;
-    width = int(size*2);
-    pos_x = pos.x-width/2;
-    pos_y = pos.y-width/2;
-
-    SDL_SetRenderDrawColor(E->renderer, 101, 98, 92, 0xFF);
-
-    for ( y = 0; y < width+1; y++ ) {
-      for ( x = 0; x < width+1; x++ ) {
-        if ( pow(pos.x - pos_x-x, 2)+pow(pos.y - pos_y-y, 2) < pow(size, 2) ) {
-          SDL_RenderDrawPoint(E->renderer, pos_x+x, pos_y+y);
-        }
-      }
-    }
+  aacircleRGBA(E->renderer, pos.x, pos.y, size, 101, 98, 92, 255);
+  filledCircleRGBA(E->renderer, pos.x, pos.y, size, 101, 98, 92, 255);
 
 }
 
@@ -212,6 +251,8 @@ void Planet::draw_link()
 
     r = (x1 > x2 ? -1 : 1);
 
+    SDL_SetRenderDrawBlendMode(E->renderer, SDL_BLENDMODE_BLEND);
+
     for ( float i = 0; i < distance*mod; i+=mod ) {
       sincos = sin(i+step*coefficient)*cos(i+step*coefficient);
       x += sincos*(amplitude+i/5)*-coefficient+speed*r;
@@ -241,22 +282,21 @@ void Planet::draw_glow()
 {
 
   int x, y, width, opacity;
-  float pos_x, pos_y, alpha;
+  float alpha;
   width = size*4;
-  pos_x = pos.x-width/2;
-  pos_y = pos.y-width/2;
 
+  SDL_SetRenderDrawBlendMode(E->renderer, SDL_BLENDMODE_BLEND);
   opacity = ( focus && hover == 0 ? HOVER_GLOW_ALPHA : hover );
 
   for ( y = 0; y < width; y++ ) {
     for ( x = 0; x < width; x++ ) {
-      alpha = (width-sqrt(pow(pos.x - pos_x-x, 2)+pow(pos.y - pos_y-y, 2))*2)/size;
+      alpha = (width-sqrt(pow(width/2-x, 2)+pow(width/2-y, 2))*2)/size;
 
       if ( alpha*opacity > 0 ) {
-        if ( x == y && opacity != 15 )
-          cout << alpha << "\t" << int(alpha*opacity) << endl;
+        // if ( x == y && opacity != 15 )
+        //   cout << alpha << "\t" << int(alpha*opacity) << endl;
         SDL_SetRenderDrawColor(E->renderer, 0xFF, 0xFF, 0xFF, int(alpha*opacity));
-        SDL_RenderDrawPoint(E->renderer, pos_x+x, pos_y+y);
+        SDL_RenderDrawPoint(E->renderer, pos.x-width/2+x, pos.y-width/2+y);
       }
     }
   }
@@ -272,17 +312,19 @@ void Planet::draw_shadow()
   float alpha;
   width = size*2;
 
+  SDL_SetRenderDrawBlendMode(E->renderer, SDL_BLENDMODE_BLEND);
 
-  for ( y = 0; y < width; y++ ) {
-    for ( x = 0; x < width+2; x++ ) {
-      alpha = x;
+  for ( y = 0; y < width+1; y++ ) {
+    for ( x = 0; x < width+1; x++ ) {
+      alpha = min(max(0.0,
+        sqrt(pow(size-y, 2)+pow(size-x, 2))*((100-size)/15)-(size*5-(x+y)*1.4)
+      ), 255.0);
 
-      if ( y == 0 )
-        cout << x << endl;
-
-      if ( alpha > 0 ) {
-        SDL_SetRenderDrawColor(E->renderer, 0, 0, 0, int(alpha));
-        SDL_RenderDrawPoint(E->renderer, pos.x-size+x, pos.y-size+y+1);
+      if (
+        pow(size+0.2-y, 2)+pow(size+0.2-x, 2) < pow(size, 2)
+      ) {
+        SDL_SetRenderDrawColor(E->renderer, 0, 0, 0, alpha);
+        SDL_RenderDrawPoint(E->renderer, pos.x-size+x+1, pos.y-size+y+1);
       }
     }
   }
@@ -297,7 +339,6 @@ void Planet::draw_shadow()
 int Planet::send( int n, Planet* target )
 {
   int len = ships.size();
-  cout << "len = " << len << endl;
   n = (n > len ? len : n);
   if ( n > 0 ) {
     for ( unsigned i = len-1; i >= 0; i-- ) {
@@ -313,24 +354,6 @@ int Planet::send( int n, Planet* target )
   }
 
   return 0;
-}
-
-//----
-// Utilisé pour transmettre des messages entre les entités
-// Arguments :
-// int  Type de message (0 = pass_ship_to_sister)
-int Planet::msg( int type )
-{
-  return 0;
-  // switch (type) {
-  //   case 0:
-  //     Planet* target = sister;
-  //     send(1, target);
-  //     return 0;
-  //   default:
-  //     cout << type << endl;
-  //     return -1;
-  // }
 }
 
 //----

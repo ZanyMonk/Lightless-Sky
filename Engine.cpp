@@ -14,6 +14,26 @@ Engine::~Engine()
 {
 }
 
+//----
+// Affiche un message dans la console.
+void Engine::log( const string &message, const string &color )
+{
+	char buff[255];
+	sprintf(buff, "\e[%sm%s", color.c_str(), message.c_str());
+	cout << buff << END_COLOR << endl;
+}
+
+//----
+// Affiche un message dans la console, en rouge et précédé du marqueur d'erreur
+void Engine::log_error( const string &message )
+{
+	char buff[255];
+	sprintf(buff, "%s%s", "[!] ", message.c_str());
+	log(message, "red");
+}
+
+//----
+// Met à jour l'objet SDL_DisplayMode de notre moteur
 void Engine::update_display_mode()
 {
 	SDL_DisplayMode dm;
@@ -21,22 +41,36 @@ void Engine::update_display_mode()
 	display = dm;
 }
 
+//----
+// Transforme une string en SDL_Texture
+// Arguments :
+//	string	message		Text à transformer
+//	Uint32	color			Couleur 0xAARRGGBB
+//	Uint8		fontSize	Taille de font
+//	string	fontFile	Chemin vers la font (FONT_PATH par défaut)
 SDL_Texture* Engine::text_to_textureColor(
 	const string &message,
-	const string &fontFile,
 	Uint32 color,
+	const string &fontFile,
 	Uint8 fontSize
 ) {
 	Uint8 *c = (Uint8 *) &color;
-	SDL_Texture* texture =  text_to_textureRGBA(message, fontFile, c[0], c[1], c[2], c[3], fontSize);
+	SDL_Texture* texture =  text_to_textureRGBA(message, c[0], c[1], c[2], c[3], fontFile, fontSize);
 
 	return texture;
 }
 
+//----
+// Transforme une string en SDL_Texture
+// Arguments :
+//	string	message		Text à transformer
+//	Uint8		r,g,b,a		Couleur
+//	Uint8		fontSize	Taille de font
+//	string	fontFile	Chemin vers la font (FONT_PATH par défaut)
 SDL_Texture* Engine::text_to_textureRGBA(
 	const string &message,
-	const string &fontFile,
 	Uint8 r, Uint8 g, Uint8 b, Uint8 a,
+	const string &fontFile,
 	Uint8 fontSize
 ) {
 
@@ -45,20 +79,20 @@ SDL_Texture* Engine::text_to_textureRGBA(
 	TTF_Font* font = TTF_OpenFont(fontFile.c_str(), fontSize);
 
 	if ( font == nullptr ) {
-		cout << "[!] TTF_OpenFont" << endl;;
+		log_error("TTF_OpenFont");
 		return nullptr;
 	}
 
 	SDL_Surface* surface = TTF_RenderText_Blended(font, message.c_str(), col);
 	if ( surface == nullptr ) {
 		TTF_CloseFont(font);
-		cout << "[!] TTF_RenderText" << endl;
+		log_error("TTF_RenderText");
 		return nullptr;
 	}
 
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 	if ( texture == nullptr ) {
-		cout << "[!] CreateTexture" << endl;
+		log_error("CreateTexture");
 	}
 
 	SDL_FreeSurface(surface);
@@ -84,13 +118,14 @@ void Engine::draw_textRGBA(
 	const string &text,
 	Point* pos,
 	Uint8 r, Uint8 g, Uint8 b, Uint8 a,
+	const string &fontFile,
 	Uint8 fontSize
 ) {
 
-  SDL_Texture* image = text_to_textureRGBA(text, FONT_PATH, r, g, b, a, fontSize);
+  SDL_Texture* image = text_to_textureRGBA(text, r, g, b, a, fontFile, fontSize);
 
   if ( image == nullptr ) {
-    cout << "[!] Engine::render_text" << endl;
+    log_error("Engine");
     TTF_Quit();
     SDL_Quit();
   }

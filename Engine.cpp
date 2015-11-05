@@ -3,42 +3,15 @@
 using namespace std;
 
 Engine::Engine()
+:cursor(Point(0,0)),
+click(0),
+amount(100)
 {
-	cursor = Point(0,0);
-	amount = 100;
-	click = false;
 	update_display_mode();
 }
 
 Engine::~Engine()
 {
-}
-
-//----
-// Affiche un message dans la console.
-void Engine::log( const string &message, const string &color )
-{
-	char buff[255];
-	sprintf(buff, "\e[%sm%s", color.c_str(), message.c_str());
-	cout << buff << END_COLOR << endl;
-}
-
-//----
-// Affiche un message dans la console, en rouge et précédé du marqueur d'erreur
-void Engine::log_error( const string &message )
-{
-	char buff[255];
-	sprintf(buff, "%s%s", "[!] ", message.c_str());
-	log(message, "red");
-}
-
-//----
-// Met à jour l'objet SDL_DisplayMode de notre moteur
-void Engine::update_display_mode()
-{
-	SDL_DisplayMode dm;
-	SDL_GetDesktopDisplayMode(0, &dm);
-	display = dm;
 }
 
 //----
@@ -65,8 +38,8 @@ SDL_Texture* Engine::text_to_textureColor(
 // Arguments :
 //	string	message		Text à transformer
 //	Uint8		r,g,b,a		Couleur
-//	Uint8		fontSize	Taille de font
 //	string	fontFile	Chemin vers la font (FONT_PATH par défaut)
+//	Uint8		fontSize	Taille de font (12 par défaut)
 SDL_Texture* Engine::text_to_textureRGBA(
 	const string &message,
 	Uint8 r, Uint8 g, Uint8 b, Uint8 a,
@@ -83,7 +56,7 @@ SDL_Texture* Engine::text_to_textureRGBA(
 		return nullptr;
 	}
 
-	SDL_Surface* surface = TTF_RenderText_Blended(font, message.c_str(), col);
+	SDL_Surface* surface = TTF_RenderText_Solid(font, message.c_str(), col);
 	if ( surface == nullptr ) {
 		TTF_CloseFont(font);
 		log_error("TTF_RenderText");
@@ -93,6 +66,7 @@ SDL_Texture* Engine::text_to_textureRGBA(
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 	if ( texture == nullptr ) {
 		log_error("CreateTexture");
+		return nullptr;
 	}
 
 	SDL_FreeSurface(surface);
@@ -170,6 +144,40 @@ void Engine::draw_polygon( short int x[], short int y[], Sint8 n, Uint32 color )
 	}
 }
 
+bool Engine::circleCollide( Point* pos1, Point* pos2, int size )
+{
+	return (pow( pos2->x - pos1->x, 2 ) + pow( pos2->y - pos1->y, 2 ) < pow( size, 2 ));
+}
+
+//----
+// Affiche un message dans la console.
+void Engine::log( const string &message, const string &color )
+{
+	char buff[255];
+	sprintf(buff, "\e[%sm%s", color.c_str(), message.c_str());
+	cout << buff << END_COLOR << endl;
+}
+
+//----
+// Affiche un message dans la console, en rouge et précédé du marqueur d'erreur
+void Engine::log_error( const string &message )
+{
+	char buff[255];
+	sprintf(buff, "%s%s", "[!] ", message.c_str());
+	log(buff, TERM_COLOR_RED);
+}
+
+//----
+// Met à jour l'objet SDL_DisplayMode de notre moteur
+void Engine::update_display_mode()
+{
+	SDL_DisplayMode dm;
+	SDL_GetDesktopDisplayMode(0, &dm);
+	display = dm;
+}
+
+//----
+// Multiplie une chaîne de caractères
 string Engine::multString( string str, Sint8 n )
 {
 	string res;

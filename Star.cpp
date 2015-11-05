@@ -1,7 +1,7 @@
 #include "Star.hpp"
 
-Star::Star( Engine* E, Point pos, float size, int faction, const string &name )
-:Planet(E, pos, size, faction, name, NULL)
+Star::Star( Engine* E, Faction* faction, Point pos, float size, const string &name )
+:Planet(E, faction, pos, size, name, NULL)
 {
 
 }

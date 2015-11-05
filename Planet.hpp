@@ -12,6 +12,7 @@
 #include "SDL2_gfx/SDL2_gfxPrimitives.h"
 #include "Utils.hpp"
 #include "Engine.hpp"
+#include "Faction.hpp"
 #include "Entity.hpp"
 #include "Ship.hpp"
 
@@ -23,23 +24,30 @@ const int LINK_GLOW_WIDTH = 15;
 class Planet : public Entity
 {
 public:
-	Planet( Engine* E, Point pos, float size, int faction = -1, const string &name = "", Planet* sister = NULL );
+	Planet( Engine* E, Faction* faction, Point pos, float size, const string &name = "", Planet* sister = NULL );
 	~Planet();
-	void onMouseDown( SDL_Event* evt );
-	void onMouseUp( SDL_Event* evt );
+
+	// Fonctions natives (Entity)
 	void update();
 	void draw();
+
+	// Texturage
 	SDL_Texture* generate_text_relief();
+
+	// Dessin
 	void draw_planet();
-	void draw_link();
+	void draw_link( Point* pos1 = nullptr, Point* pos2 = nullptr, Uint8 r = 255, Uint8 g = 255, Uint8 b = 255 );
 	void draw_glow();
 	void draw_shadow();
+
+	// Gestion
+	void link_to( Planet* new_sister );
 	int send( int n, Planet* target );
-	int host( Ship* ship );
+
+	// Divers
 	string generate_name( Uint8 min, Uint8 max );
 
 	Planet* sister;
-	int faction;
 	int hover;
 	int focus;
 	int select;

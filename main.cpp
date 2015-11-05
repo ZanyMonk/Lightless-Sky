@@ -4,10 +4,7 @@
 #include <map>
 #include <stdlib.h>
 #include "SDL2_gfx/SDL2_gfxPrimitives.h"
-#include "Utils.hpp"
 #include "Engine.hpp"
-#include "Planet.hpp"
-#include "Ship.hpp"
 #include "Game.hpp"
 
 using namespace std;

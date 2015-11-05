@@ -6,17 +6,13 @@ const char SHIP_COLOR_R = 200;
 const char SHIP_COLOR_G = 130;
 const char SHIP_COLOR_B = 250;
 
-Ship::Ship( Engine* E, Entity* planet )
-	:Entity(E, planet->pos, 1),
+Ship::Ship( Engine* E, Faction* faction, Entity* planet )
+	:Entity(E, faction, planet->pos, 1),
 	planet(planet),
 	target(planet->pos),
 	is_traveling(false)
 {
-	seed = SDL_GetTicks();
-	srand(seed);
-	seed = rand();
 	_health = 100;
-	SDL_Delay(1);
 }
 
 Ship::~Ship()
@@ -40,8 +36,22 @@ void Ship::draw()
 		// On peut carrément améliorer ça, soit avec un sprite, soit avec un peu de code ;)
 		// E->draw_circle(size, &pos, 0xFFFFFFFF);
 		// E->draw_circle(size*2, &pos, 0x55FFFFFF);
-		circleRGBA(E->renderer, pos.x, pos.y, size, 0xFF, 0xFF, 0xFF, 0xFF);
-		circleRGBA(E->renderer, pos.x, pos.y, size*2, 0xFF, 0xFF, 0xFF, 0x55);
+		circleRGBA(
+			E->renderer,
+			pos.x, pos.y, size,
+			faction->color.r,
+			faction->color.g,
+			faction->color.b,
+			0xFF
+		);
+		circleRGBA(
+			E->renderer,
+			pos.x, pos.y, size*2,
+			faction->color.r,
+			faction->color.g,
+			faction->color.b,
+			0x55
+		);
 
 	}
 

@@ -45,11 +45,12 @@ void Interface::onMouseMotion( SDL_Event* evt )
   if (
        sliding
     || (
-         E->click
+         E->click == 1
       && evt->button.x > sb_x && evt->button.x < sb_x+sb_s
       && evt->button.y > sb_y
     )
   ) {
+    cout << sliding << " " << E->click << endl;
     sliding = true;
     E->amount = max(0, min((evt->button.x-sb_x-w/2)/(sb_s/100)+2, 100));
   }

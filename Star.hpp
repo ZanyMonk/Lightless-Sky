@@ -11,7 +11,7 @@
 class Star : public Planet {
 private:
 public:
-  Star( Engine* E, Point pos, float size, int faction = -1, const string &name = "" );
+  Star( Engine* E, Faction* faction, Point pos, float size, const string &name = "" );
   ~Star();
   void draw();
 };

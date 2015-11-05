@@ -18,11 +18,12 @@ class Entity {
 protected:
   Engine* E;
 public:
-  Entity ( Engine* E, Point pos, float size, const string &name = "" );
+  Entity ( Engine* E, Faction* faction, Point pos, float size, const string &name = "" );
   virtual ~Entity () = 0;
   virtual void update() = 0;
-  virtual void draw() = 0;
+  virtual void draw();
 
+  Faction* faction;
   Point pos;
   int seed;
   float size;

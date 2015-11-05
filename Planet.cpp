@@ -22,17 +22,15 @@ using namespace std;
  *  SDL_Texture* text_name    Texture du nom de la planète
  */
 
-Planet::Planet( Engine* E, Point pos, float size, int faction, const string &name, Planet* sister )
-  :Entity(E, pos, size, (name == "" ? generate_name(2, 4) : name)),
+Planet::Planet( Engine* E, Faction* faction, Point pos, float size, const string &name, Planet* sister )
+  :Entity(E, faction, pos, size, (name == "" ? generate_name(2, 4) : name)),
   sister(sister),
-  faction(faction),
   hover(0),
   focus(0),
   select(0),
-  text_relief(nullptr),
   text_name(nullptr)
 {
-
+  // text_relief = generate_text_relief();
 }
 
 Planet::~Planet()
@@ -44,12 +42,6 @@ Planet::~Planet()
 
 void Planet::update()
 {
-  // On génère la texture de la planète si ça n'a pas déjà été fait
-  if ( text_relief == nullptr ) {
-    text_relief = generate_text_relief();
-  }
-
-  // Si on n'a pas encore généré la texture du nom de la planète, on le fait
   if ( text_name == nullptr ) {
     text_name = E->text_to_textureRGBA(name, 255, 255, 255, 255);
   }
@@ -93,6 +85,24 @@ void Planet::draw()
 
   draw_link();
 
+  if ( select ) {
+    if ( E->click == 1 ) {
+      // On dessine un lien entre la planète sélectionnée et le curseur
+      aalineRGBA(
+        E->renderer,
+        pos.x, pos.y,
+        E->cursor.x, E->cursor.y,
+        255, 255, 255, 255
+      );
+    } else {
+      if ( sister == NULL ) {
+        draw_link(&pos, &E->cursor);
+      } else {
+        draw_link(&pos, &E->cursor, 255, 0, 0);
+      }
+    }
+  }
+
   if ( hover || focus ) {
     draw_glow();
   }
@@ -111,16 +121,6 @@ void Planet::draw()
   // On dessine l'ombre de la planète
   draw_shadow();
 
-  if ( select ) {
-    // On dessine un lien entre la planète sélectionnée et le curseur
-    lineRGBA(
-      E->renderer,
-      pos.x, pos.y,
-      E->cursor.x, E->cursor.y,
-      255, 255, 255, 255
-    );
-  }
-
   // On met à jour les positions et on dessine tous les vaisseaux apartenant à cette planète
   for ( unsigned i = 0; i < ships.size(); i++ ) {
     ships.at(i)->update();
@@ -131,83 +131,28 @@ void Planet::draw()
 
 }
 
-//----
-// Appelé au clique
-void Planet::onMouseDown( SDL_Event* evt )
-{
-  if (
-    // Si collision curseur/planète
-    pow( pos.x - E->cursor.x, 2 ) + pow( pos.y - E->cursor.y, 2 )
-      < pow( size, 2 )
-  ) {
-    if ( evt->button.button == SDL_BUTTON_LEFT ) {
-      select = 1;
-    } else {
-      focus = 1;
-    }
-  } else {
-    select = 0;
-    focus = 0;
-    // if ( evt->button.button == SDL_BUTTON_LEFT ) {
-    // } else {
-    // }
-  }
-
-}
-
-//----
-// Appelé au lâché de clique
-void Planet::onMouseUp( SDL_Event* evt )
-{
-
-  if (
-    // Si collision curseur/planète
-    pow( pos.x - E->cursor.x, 2 ) + pow( pos.y - E->cursor.y, 2 )
-      < pow( size, 2 )
-  ) {
-    // if ( evt->button.button == SDL_BUTTON_LEFT ) {
-    // } else {
-    // }
-  } else {
-    if ( evt->button.button == SDL_BUTTON_LEFT ) {
-      if ( select == 1 ) {
-        for ( unsigned i = 0; i < planets.size(); i++ ) {
-          if (
-            // Si collision curseur/planète
-            pow( planets.at(i)->pos.x - E->cursor.x, 2 ) + pow( planets.at(i)->pos.y - E->cursor.y, 2 )
-              < pow( planets.at(i)->size, 2 )
-          ) {
-            send(int(ships.size()*(float(E->amount)/100.0)), planets.at(i));
-            break;
-          }
-        }
-      }
-    }
-    focus = 0;
-    select = 0;
-  }
-
-}
-
 SDL_Texture* Planet::generate_text_relief()
 {
 
-  int width = size*2;
+  int W, H, random;
 
-  SDL_Texture* texture = SDL_CreateTexture(E->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width*3.14, width);
+  H = size*2;
+  W = size*3.14;
+
+  SDL_Texture* texture = SDL_CreateTexture(E->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, W, H);
 
   // TODO : Génération de la texture de la planète
-  SDL_Rect rect;
-  rect.x = pos.x;
-  rect.y = pos.y;
-  rect.w = rect.h = width;
   SDL_SetRenderTarget(E->renderer, texture);
-  SDL_SetRenderDrawColor(
-    E->renderer,
-    0xFF, 0xFF, 0xFF, 0xFF
-  );
+  SDL_SetRenderDrawColor(E->renderer,0xFF, 0xFF, 0xFF, 0xFF);
   SDL_RenderClear(E->renderer);
-  SDL_RenderDrawRect(E->renderer, &rect);
+  SDL_SetRenderDrawColor(E->renderer,0x00, 0x00, 0x00, 0xFF);
+
+  for ( int i = 0; i < 100; i++ ) {
+    srand(SDL_GetTicks());
+    random = rand();
+    SDL_Delay(1);
+    SDL_RenderDrawPoint(E->renderer, random%W, random%H);
+  }
 
   SDL_SetRenderTarget(E->renderer, NULL);
 
@@ -225,22 +170,28 @@ void Planet::draw_planet()
 
 //----
 // Dessine le lien entre cette planète et sa planète réceptrice
-void Planet::draw_link()
+void Planet::draw_link( Point* pos1, Point* pos2, Uint8 r, Uint8 g, Uint8 b )
 {
-  if ( sister != NULL ) {
-
-    short int distance, x1, y1, x2, y2, r;
-    float speed, mod, amplitude, x, y, step, coefficient, sincos;
-    Point handle = Point(700, 300);
-
-    speed = 1;
-    mod = 0.01;
-    amplitude = 0.15;
-
+  short int distance, x1, y1, x2, y2, radius;
+  float speed, mod, amplitude, x, y, step, coefficient, sincos;
+  bool args = (pos1 != nullptr && pos2 != nullptr);
+  if ( args ) {
+    x1 = x = pos1->x;
+    y1 = y = pos1->y;
+    x2 = pos2->x;
+    y2 = pos2->y;
+  } else if ( sister != NULL ) {
     x1 = x = pos.x;
     y1 = y = pos.y;
     x2 = sister->pos.x;
     y2 = sister->pos.y;
+  }
+
+  if ( args || sister != NULL ) {
+
+    speed = 1;
+    mod = 0.01;
+    amplitude = 0.15;
 
     // Distance entre les deux planètes
     distance = abs(x2-x1);
@@ -249,25 +200,25 @@ void Planet::draw_link()
     // Coefficient directeur
     coefficient = float(y1-y2)/float(x1-x2);
 
-    r = (x1 > x2 ? -1 : 1);
+    radius = (x1 > x2 ? -1 : 1);
 
     SDL_SetRenderDrawBlendMode(E->renderer, SDL_BLENDMODE_BLEND);
 
     for ( float i = 0; i < distance*mod; i+=mod ) {
       sincos = sin(i+step*coefficient)*cos(i+step*coefficient);
-      x += sincos*(amplitude+i/5)*-coefficient+speed*r;
-      y += sincos*(amplitude+i/5)+speed*coefficient*r;
+      x += sincos*(amplitude+i/5)*-coefficient+speed*radius;
+      y += sincos*(amplitude+i/5)+speed*coefficient*radius;
 
       for ( int j = 0; j < LINK_GLOW_WIDTH; j++ ) {
       	SDL_SetRenderDrawColor(
           E->renderer,
-          0xFF, 0xFF, 0xFF,
-          (j>LINK_GLOW_WIDTH/2 ? LINK_GLOW_WIDTH-j : j)
+          r, g, b,
+          (j>LINK_GLOW_WIDTH/2 ? LINK_GLOW_WIDTH-j : j)+10
         );
         SDL_RenderDrawPoint(
           E->renderer,
-          x-LINK_GLOW_WIDTH/2+j*-coefficient+speed*r,
-          y-LINK_GLOW_WIDTH/2+j+speed*coefficient*r
+          x-LINK_GLOW_WIDTH/2+j*-coefficient+speed*radius,
+          y-LINK_GLOW_WIDTH/2+j+speed*coefficient*radius
         );
       }
     }
@@ -281,9 +232,13 @@ void Planet::draw_link()
 void Planet::draw_glow()
 {
 
-  int x, y, width, opacity;
+  int x, y, width, opacity, r, g, b;
   float alpha;
   width = size*4;
+
+  r = faction->color.r;
+  g = faction->color.g;
+  b = faction->color.b;
 
   SDL_SetRenderDrawBlendMode(E->renderer, SDL_BLENDMODE_BLEND);
   opacity = ( focus && hover == 0 ? HOVER_GLOW_ALPHA : hover );
@@ -295,7 +250,7 @@ void Planet::draw_glow()
       if ( alpha*opacity > 0 ) {
         // if ( x == y && opacity != 15 )
         //   cout << alpha << "\t" << int(alpha*opacity) << endl;
-        SDL_SetRenderDrawColor(E->renderer, 0xFF, 0xFF, 0xFF, int(alpha*opacity));
+        SDL_SetRenderDrawColor(E->renderer, r, g, b, int(alpha*opacity));
         SDL_RenderDrawPoint(E->renderer, pos.x-width/2+x, pos.y-width/2+y);
       }
     }
@@ -329,6 +284,21 @@ void Planet::draw_shadow()
     }
   }
 
+}
+
+//----
+// Lie cette planète avec une sœur
+// Arguments :
+//  Planet* sister    Planète sœur à qui se lier
+void Planet::link_to( Planet* new_sister )
+{
+  if (
+    new_sister == NULL
+    || new_sister->sister == NULL
+    || new_sister->sister != this
+  ) {
+    sister = new_sister;
+  }
 }
 
 //----

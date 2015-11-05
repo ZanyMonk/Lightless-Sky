@@ -11,12 +11,13 @@
 #include "SDL2_gfx/SDL2_gfxPrimitives.h"
 #include "Engine.hpp"
 #include "Utils.hpp"
+#include "Faction.hpp"
 #include "Entity.hpp"
 
 class Ship : public Entity
 {
 public:
-	Ship( Engine* E, Entity* planet );
+	Ship( Engine* E, Faction* faction, Entity* planet );
 	~Ship();
 	void draw();
 	void update();
